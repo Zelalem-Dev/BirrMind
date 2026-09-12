@@ -18,11 +18,13 @@ export interface AnalysisOutput {
     type: RecommendationType;
     title: string;
     explanation: string;
+    confidence?: number;
     priority: 'critical' | 'high' | 'medium' | 'low';
     recommendedAction: string;
     actionType: RecommendationActionType;
     actionPayload?: Record<string, any>;
     evidence: string[];
+    requiresConfirmation?: boolean;
   }>;
 }
 
@@ -39,11 +41,13 @@ YOUR MANDATE:
    - type: 'inventory_restock' | 'pricing_adjustment' | 'expense_saving' | 'revenue_opportunity' | 'operational_risk'
    - title: concise heading
    - explanation: merchant-friendly context explaining why this matters
+   - confidence: number between 0.70 and 0.99
    - priority: 'critical' | 'high' | 'medium' | 'low'
    - recommendedAction: clear suggestion
    - actionType: 'restock_product' | 'adjust_price' | 'log_expense' | 'review_catalog' | 'manual_action'
    - actionPayload: JSON object (e.g., for restock_product: { productId: string, quantity: number, costPrice: number, vendor?: string })
    - evidence: list of concrete facts from the context that justify this recommendation
+   - requiresConfirmation: true (AI recommendations must always require merchant approval)
 
 Return valid JSON with this exact structure:
 {
@@ -58,11 +62,13 @@ Return valid JSON with this exact structure:
       "type": string,
       "title": string,
       "explanation": string,
+      "confidence": number,
       "priority": string,
       "recommendedAction": string,
       "actionType": string,
       "actionPayload": object,
-      "evidence": string[]
+      "evidence": string[],
+      "requiresConfirmation": true
     }
   ]
 }

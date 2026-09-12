@@ -191,11 +191,13 @@ export interface AIRecommendation {
   type: RecommendationType;
   title: string;
   explanation: string;
+  confidence?: number; // 0.0 - 1.0 confidence score
   priority: 'critical' | 'high' | 'medium' | 'low';
   recommendedAction: string;
   actionType: RecommendationActionType;
   actionPayload?: Record<string, any>;
   evidence: string[]; // Facts calculated deterministically by server
+  requiresConfirmation?: boolean; // Always true for mutations
   status: 'pending' | 'accepted' | 'rejected' | 'executed';
   createdAt: string;
   confirmedByUserId?: string;
@@ -248,6 +250,7 @@ export interface BusinessContextForAI {
   recentRevenueTrend: number;
   transactionCount: number;
   estimatedGrossProfit: number;
+  netOperatingResult: number;
   expenses: {
     todayTotal: number;
     breakdown: Record<string, number>;
@@ -283,6 +286,14 @@ export interface BusinessContextForAI {
     fact: string;
     type: string;
     confidence: number;
+  }[];
+  recentRecommendations: {
+    id: string;
+    title: string;
+    type: string;
+    priority: string;
+    status: string;
+    actionType: string;
   }[];
 }
 

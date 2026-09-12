@@ -24,11 +24,37 @@ import { explainBusinessHealth } from './server/ai/healthExplainer.js';
 import { analyzeBusiness } from './server/ai/businessAnalyzer.js';
 import { askCopilot } from './server/ai/copilotService.js';
 import { isGeminiConfigured } from './server/ai/geminiClient.js';
+import { setProviders } from './server/ai/providers/index.js';
+import { GeminiProvider } from './server/ai/providers/geminiProvider.js';
+import { AddisProvider } from './server/ai/providers/addisProvider.js';
+import { FalProvider } from './server/ai/providers/falProvider.js';
+import { ElevenLabsProvider } from './server/ai/providers/elevenLabsProvider.js';
+import { processReceiptImage } from './server/ai/receiptPipeline.js';
+import { generateAudioAutoRoute } from './server/ai/orchestrator.js';
+import multer from 'multer';
 
+// Setup file upload for receipts
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
+// Register Providers
+const addisProvider = new AddisProvider();
+const falProvider = new FalProvider();
+const elevenLabsProvider = new ElevenLabsProvider();
+const geminiProvider = new GeminiProvider();
+
+setProviders({
+  llm: geminiProvider,
+  ethiopianLLM: addisProvider,
+  fallbackLLM: geminiProvider,
+  stt: addisProvider,
+  tts: elevenLabsProvider,
+  image: falProvider,
+  vision: falProvider
+});
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ extended: true, limit: '12mb' }));
@@ -707,6 +733,48 @@ app.post('/api/ai/chat', requireAuth, requireBusiness('staff'), async (req, res)
   }
 });
 
+// 20. Process Receipt Image
+app.post('/api/ai/receipt/extract', requireAuth, requireBusiness('manager'), upload.single('receipt'), async (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'No receipt image provided' });
+      return;
+    }
+
+    const result = await processReceiptImage(req.file.buffer, req.file.mimetype);
+    res.json(result);
+  } catch (err: any) {
+    console.error('Receipt extraction error:', err);
+    res.status(500).json({ error: err.message || 'Failed to extract receipt data' });
+  }
+});
+
+// 21. Generate TTS Audio
+app.post('/api/ai/tts', requireAuth, requireBusiness('staff'), async (req, res) => {
+  try {
+    const { text, voiceId } = req.body;
+    if (!text) {
+      res.status(400).json({ error: 'Text is required for TTS' });
+      return;
+    }
+
+    const result = await generateAudioAutoRoute(text, voiceId);
+    
+    if (!result.success || !result.data) {
+      res.status(500).json({ error: result.error || 'Failed to generate audio' });
+      return;
+    }
+
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': result.data.length,
+    });
+    res.send(result.data);
+  } catch (err: any) {
+    console.error('TTS error:', err);
+    res.status(500).json({ error: err.message || 'Failed to generate audio' });
+  }
+});
 // ---------------------- VITE / STATIC SETUP ---------------------- //
 
 async function startServer() {

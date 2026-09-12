@@ -14,7 +14,7 @@ import { User, Business, BusinessMembership, MembershipRole } from '../../types/
 interface ShellHeaderProps {
   currentBusiness: Business;
   currentUser: User;
-  currentMembership: BusinessMembership;
+  currentMembership?: BusinessMembership | null;
   accessibleBusinesses: { business: Business; role: MembershipRole }[];
   allUsers: { id: string; name: string; role: string; email: string }[];
   databaseEngine: 'supabase' | 'local_postgres_compatible';
@@ -38,7 +38,7 @@ export const ShellHeader: React.FC<ShellHeaderProps> = ({
   activeTab,
   setActiveTab,
 }) => {
-  const getRoleBadge = (role: MembershipRole) => {
+  const getRoleBadge = (role?: MembershipRole) => {
     switch (role) {
       case 'owner':
         return 'bg-amber-100 text-amber-800 border-amber-300';
@@ -46,6 +46,8 @@ export const ShellHeader: React.FC<ShellHeaderProps> = ({
         return 'bg-blue-100 text-blue-800 border-blue-300';
       case 'staff':
         return 'bg-stone-100 text-stone-700 border-stone-300';
+      default:
+        return 'bg-stone-800 text-stone-400 border-stone-700';
     }
   };
 
@@ -116,8 +118,8 @@ export const ShellHeader: React.FC<ShellHeaderProps> = ({
                   </option>
                 ))}
               </select>
-              <span className={`text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded border ml-1 ${getRoleBadge(currentMembership.role)}`}>
-                {currentMembership.role}
+              <span className={`text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded border ml-1 ${getRoleBadge(currentMembership?.role)}`}>
+                {currentMembership?.role || 'No Role'}
               </span>
             </div>
 

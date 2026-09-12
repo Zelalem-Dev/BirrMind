@@ -8,13 +8,14 @@ export async function buildBusinessContext(businessId: string): Promise<Business
     throw new Error(`Business not found: ${businessId}`);
   }
 
-  const [products, transactions, expenses, movements, events, memories] = await Promise.all([
+  const [products, transactions, expenses, movements, events, memories, recommendations] = await Promise.all([
     repository.getProducts(businessId),
     repository.getTransactions(businessId, 100),
     repository.getExpenses(businessId, 50),
     repository.getInventoryMovements(businessId, 25),
     repository.getBusinessEvents(businessId, 25),
     repository.getMemories(businessId, 50),
+    repository.getRecommendations(businessId),
   ]);
 
   const now = new Date();
@@ -46,7 +47,11 @@ export async function buildBusinessContext(businessId: string): Promise<Business
     recentRevenueTrend = 100;
   }
 
-  // 3. Estimated Gross Profit (Revenue minus Cost of Goods Sold)
+  // 3. Expenses Breakdown (computed first — needed for net operating result)
+  const todayExpensesList = expenses.filter(e => new Date(e.createdAt).getTime() >= startOfDay);
+  const todayExpensesTotal = Number(todayExpensesList.reduce((sum, e) => sum + e.amount, 0).toFixed(2));
+
+  // 4. Estimated Gross Profit (Revenue minus Cost of Goods Sold)
   let estimatedCostOfGoods = 0;
   const productCostMap = new Map<string, number>(products.map(p => [p.id, p.costPrice]));
   
@@ -57,10 +62,7 @@ export async function buildBusinessContext(businessId: string): Promise<Business
     }
   }
   const estimatedGrossProfit = Number((todayRevenue - estimatedCostOfGoods).toFixed(2));
-
-  // 4. Expenses Breakdown
-  const todayExpensesList = expenses.filter(e => new Date(e.createdAt).getTime() >= startOfDay);
-  const todayExpensesTotal = Number(todayExpensesList.reduce((sum, e) => sum + e.amount, 0).toFixed(2));
+  const netOperatingResult = Number((estimatedGrossProfit - todayExpensesTotal).toFixed(2));
 
   const breakdown: Record<string, number> = {};
   for (const exp of todayExpensesList) {
@@ -162,6 +164,18 @@ export async function buildBusinessContext(businessId: string): Promise<Business
       confidence: m.confidence,
     }));
 
+  // 11. Recent Recommendations & Status
+  const recentRecommendations = (recommendations || [])
+    .slice(0, 10)
+    .map(r => ({
+      id: r.id,
+      title: r.title,
+      type: r.type,
+      priority: r.priority,
+      status: r.status,
+      actionType: r.actionType,
+    }));
+
   return {
     businessProfile: {
       id: business.id,
@@ -178,6 +192,7 @@ export async function buildBusinessContext(businessId: string): Promise<Business
     recentRevenueTrend,
     transactionCount,
     estimatedGrossProfit,
+    netOperatingResult,
     expenses: {
       todayTotal: todayExpensesTotal,
       breakdown,
@@ -194,5 +209,6 @@ export async function buildBusinessContext(businessId: string): Promise<Business
     relevantBusinessEvents: recentEvents,
     targetDailyRevenue: business.targetDailyRevenue,
     approvedBusinessMemories: approvedMemories,
+    recentRecommendations,
   };
 }

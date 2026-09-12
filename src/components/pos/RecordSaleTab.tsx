@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { Product, Business, Transaction } from '../../types/index.js';
 import { api } from '../../lib/api.js';
+import { VoiceSaleInput } from './VoiceSaleInput.js';
+import { ReceiptInput } from './ReceiptInput.js';
 
 interface RecordSaleTabProps {
   business: Business;
@@ -100,6 +102,35 @@ export const RecordSaleTab: React.FC<RecordSaleTabProps> = ({
     setCart(prev => prev.filter(item => item.productId !== productId));
   };
 
+  const handleItemsParsed = (items: { productId: string; quantity: number }[]) => {
+    items.forEach(item => {
+      const product = products.find(p => p.id === item.productId);
+      if (product) {
+        setCart(prev => {
+          const existing = prev.find(i => i.productId === product.id);
+          if (existing) {
+            return prev.map(i =>
+              i.productId === product.id
+                ? { ...i, quantity: i.quantity + item.quantity }
+                : i
+            );
+          }
+          return [
+            ...prev,
+            {
+              productId: product.id,
+              name: product.name,
+              unitPrice: product.sellingPrice,
+              quantity: item.quantity,
+              currentStock: product.currentStock,
+            },
+          ];
+        });
+      }
+    });
+    setLastSuccess(null);
+  };
+
   // Client-side visual preview calculation (Server strictly recalculates and validates)
   const cartSubtotal = cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
 
@@ -177,6 +208,12 @@ export const RecordSaleTab: React.FC<RecordSaleTabProps> = ({
           </div>
         </div>
       )}
+
+      {/* Multimodal Inputs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <VoiceSaleInput products={products} onItemsParsed={handleItemsParsed} />
+        <ReceiptInput products={products} onItemsParsed={handleItemsParsed} />
+      </div>
 
       {/* 2-Column POS Layout: Left = Product Catalog, Right = Active Checkout Cart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

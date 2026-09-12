@@ -15,6 +15,7 @@ import {
   AIRecommendation
 } from '../../src/types/index.js';
 import { getSupabaseClient, isSupabaseConfigured } from './supabase.js';
+import { SupabaseRepository } from './repository.supabase.js';
 
 interface DatabaseState {
   users: User[];
@@ -984,4 +985,7 @@ class DatabaseRepository {
   }
 }
 
-export const repository = new DatabaseRepository();
+export const repository = isSupabaseConfigured()
+  ? new SupabaseRepository() as unknown as DatabaseRepository // duck typing for now
+  : new DatabaseRepository();
+

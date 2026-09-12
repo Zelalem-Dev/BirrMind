@@ -17,8 +17,8 @@ import { api } from '../../lib/api.js';
 interface TeamTabProps {
   business: Business;
   currentUser: User;
-  currentMembership: BusinessMembership;
-  memberships: { membership: BusinessMembership; user: User }[];
+  currentMembership?: BusinessMembership | null;
+  memberships: (BusinessMembership & { user: User })[];
   databaseEngine: 'supabase' | 'local_postgres_compatible';
   onMemberAdded: () => void;
 }
@@ -27,7 +27,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
   business,
   currentUser,
   currentMembership,
-  memberships,
+  memberships = [],
   databaseEngine,
   onMemberAdded,
 }) => {
@@ -39,7 +39,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const isOwner = currentMembership.role === 'owner';
+  const isOwner = currentMembership?.role === 'owner';
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +68,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
     }
   };
 
-  const getRoleBadge = (r: MembershipRole) => {
+  const getRoleBadge = (r?: MembershipRole) => {
     switch (r) {
       case 'owner':
         return 'bg-amber-100 text-amber-900 border-amber-300 font-bold';
@@ -76,6 +76,8 @@ export const TeamTab: React.FC<TeamTabProps> = ({
         return 'bg-blue-100 text-blue-900 border-blue-300 font-bold';
       case 'staff':
         return 'bg-stone-100 text-stone-700 border-stone-300 font-semibold';
+      default:
+        return 'bg-stone-100 text-stone-600 border-stone-200 font-normal';
     }
   };
 
@@ -101,6 +103,13 @@ export const TeamTab: React.FC<TeamTabProps> = ({
           </button>
         )}
       </div>
+
+      {!currentMembership && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+          <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+          <span>You do not have an active membership in this business entity ({business.name}). Management actions are restricted.</span>
+        </div>
+      )}
 
       {feedback && (
         <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
@@ -195,35 +204,49 @@ export const TeamTab: React.FC<TeamTabProps> = ({
           </div>
 
           <div className="divide-y divide-stone-100">
-            {memberships.map((item) => (
-              <div key={item.membership.id} className="py-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-800 font-serif font-bold flex items-center justify-center text-sm border border-amber-200">
-                    {item.user.fullName.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold text-xs text-stone-900">{item.user.fullName}</p>
-                      {item.user.id === currentUser.id && (
-                        <span className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded font-mono">
-                          You
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-stone-500">{item.user.email}</p>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase border ${getRoleBadge(item.membership.role)}`}>
-                    {item.membership.role}
-                  </span>
-                  <p className="text-[10px] text-stone-400 font-mono mt-1">
-                    Joined {new Date(item.membership.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
+            {(!memberships || memberships.length === 0) ? (
+              <div className="py-8 text-center text-stone-400 text-xs font-medium">
+                No active team members registered for this business.
               </div>
-            ))}
+            ) : (
+              memberships.map((item) => {
+                const userObj = item.user;
+                const displayName = userObj?.fullName || userObj?.email || item.userId;
+                const displayEmail = userObj?.email || 'No email provided';
+                const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
+                const isCurrent = (userObj?.id && currentUser?.id && userObj.id === currentUser.id) || (currentUser?.id && item.userId === currentUser.id);
+
+                return (
+                  <div key={item.id} className="py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-800 font-serif font-bold flex items-center justify-center text-sm border border-amber-200">
+                        {initial}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-xs text-stone-900">{displayName}</p>
+                          {isCurrent && (
+                            <span className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded font-mono">
+                              You
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-stone-500">{displayEmail}</p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase border ${getRoleBadge(item.role)}`}>
+                        {item.role}
+                      </span>
+                      <p className="text-[10px] text-stone-400 font-mono mt-1">
+                        Joined {item.joinedAt ? new Date(item.joinedAt).toLocaleDateString() : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { repository, INITIAL_USER_ID, DEFAULT_BUSINESS_ID } from '../db/repository.js';
+import { getSupabaseClient } from '../db/supabase.js';
 import { User, Business, BusinessMembership, MembershipRole } from '../../src/types/index.js';
 
 declare global {
@@ -18,27 +19,44 @@ const ROLE_RANK: Record<MembershipRole, number> = {
   staff: 1,
 };
 
-/**
- * Authentication middleware: identifies user from x-user-id or Authorization header.
- * Defaults to demo user 'user_marco' if no header is present in development.
- */
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    let userId = (req.headers['x-user-id'] as string) || '';
-
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    // In production, we ONLY trust the Authorization header JWT from Supabase
+    let userId = '';
     const authHeader = req.headers.authorization;
-    if (!userId && authHeader && authHeader.startsWith('Bearer ')) {
-      userId = authHeader.substring(7).trim();
+    let token = '';
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7).trim();
+    }
+
+    if (token) {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const { data, error } = await supabase.auth.getUser(token);
+        if (error || !data.user) {
+          res.status(401).json({ error: 'Unauthorized: Invalid Supabase token' });
+          return;
+        }
+        userId = data.user.id;
+      }
+    }
+
+    if (!isProduction && !userId) {
+      // Allow demo user fallback ONLY in non-production environments
+      userId = (req.headers['x-user-id'] as string) || INITIAL_USER_ID;
     }
 
     if (!userId) {
-      // In interactive sandbox preview, default to demo owner
-      userId = INITIAL_USER_ID;
+      res.status(401).json({ error: 'Unauthorized: Authentication required' });
+      return;
     }
 
     const user = await repository.getUser(userId);
     if (!user) {
-      res.status(401).json({ error: 'Unauthorized: User does not exist or token is invalid' });
+      res.status(401).json({ error: 'Unauthorized: User does not exist' });
       return;
     }
 

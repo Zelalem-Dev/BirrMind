@@ -1,0 +1,11 @@
+{
+  "name": "Mercato AI",
+  "description": "AI operating system and business copilot for small businesses.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

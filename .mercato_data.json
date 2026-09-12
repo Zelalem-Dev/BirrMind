@@ -1,0 +1,826 @@
+{
+  "users": [
+    {
+      "id": "user_marco",
+      "email": "marco@mercatofoods.com",
+      "fullName": "Marco Rossi",
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-06-13T23:04:44.276Z"
+    },
+    {
+      "id": "user_elena",
+      "email": "elena@mercatofoods.com",
+      "fullName": "Elena Bianchi",
+      "avatarUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-07-13T23:04:44.276Z"
+    },
+    {
+      "id": "user_matteo",
+      "email": "matteo@mercatofoods.com",
+      "fullName": "Matteo Conti",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-08-12T23:04:44.276Z"
+    }
+  ],
+  "businesses": [
+    {
+      "id": "biz_mercato_pantry",
+      "name": "Mercato Artisan Provisions",
+      "slug": "mercato-pantry",
+      "type": "grocery",
+      "currency": "USD",
+      "currencySymbol": "$",
+      "targetDailyRevenue": 650,
+      "operatingHours": "8:00 AM - 7:00 PM",
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T22:04:44.276Z"
+    },
+    {
+      "id": "biz_mercato_cafe",
+      "name": "Mercato Espresso Bar",
+      "slug": "mercato-espresso",
+      "type": "cafe",
+      "currency": "USD",
+      "currencySymbol": "$",
+      "targetDailyRevenue": 450,
+      "operatingHours": "7:00 AM - 4:00 PM",
+      "createdAt": "2026-07-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T21:04:44.276Z"
+    }
+  ],
+  "memberships": [
+    {
+      "id": "bm_marco_pantry",
+      "userId": "user_marco",
+      "businessId": "biz_mercato_pantry",
+      "role": "owner",
+      "joinedAt": "2026-06-13T23:04:44.276Z"
+    },
+    {
+      "id": "bm_marco_cafe",
+      "userId": "user_marco",
+      "businessId": "biz_mercato_cafe",
+      "role": "owner",
+      "joinedAt": "2026-07-13T23:04:44.276Z"
+    },
+    {
+      "id": "bm_elena_pantry",
+      "userId": "user_elena",
+      "businessId": "biz_mercato_pantry",
+      "role": "manager",
+      "joinedAt": "2026-07-13T23:04:44.276Z"
+    },
+    {
+      "id": "bm_elena_cafe",
+      "userId": "user_elena",
+      "businessId": "biz_mercato_cafe",
+      "role": "staff",
+      "joinedAt": "2026-08-12T23:04:44.276Z"
+    },
+    {
+      "id": "bm_matteo_pantry",
+      "userId": "user_matteo",
+      "businessId": "biz_mercato_pantry",
+      "role": "staff",
+      "joinedAt": "2026-08-12T23:04:44.276Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_oil",
+      "businessId": "biz_mercato_pantry",
+      "name": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "sku": "PAN-OIL-750",
+      "category": "Pantry",
+      "costPrice": 11,
+      "sellingPrice": 18,
+      "currentStock": 15,
+      "reorderPoint": 6,
+      "reorderQuantity": 18,
+      "unit": "bottle",
+      "supplier": "Umbria Imports Co.",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T23:04:46.190Z"
+    },
+    {
+      "id": "prod_bread",
+      "businessId": "biz_mercato_pantry",
+      "name": "Artisan Country Sourdough Loaf",
+      "sku": "BAK-SRD-001",
+      "category": "Bakery",
+      "costPrice": 2.2,
+      "sellingPrice": 6.5,
+      "currentStock": 7,
+      "reorderPoint": 5,
+      "reorderQuantity": 20,
+      "unit": "loaf",
+      "supplier": "Golden Hearth Bakehouse",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T22:04:44.276Z"
+    },
+    {
+      "id": "prod_cheese",
+      "businessId": "biz_mercato_pantry",
+      "name": "Parmigiano Reggiano DOP (200g)",
+      "sku": "DAI-PRM-200",
+      "category": "Dairy & Cheese",
+      "costPrice": 6,
+      "sellingPrice": 12.5,
+      "currentStock": 14,
+      "reorderPoint": 8,
+      "reorderQuantity": 24,
+      "unit": "wedge",
+      "supplier": "Parma Deli Select",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T11:04:44.276Z"
+    },
+    {
+      "id": "prod_coffee",
+      "businessId": "biz_mercato_pantry",
+      "name": "Signature Espresso Roast Beans (1kg)",
+      "sku": "BEV-COF-1KG",
+      "category": "Beverages",
+      "costPrice": 11,
+      "sellingPrice": 22,
+      "currentStock": 5,
+      "reorderPoint": 6,
+      "reorderQuantity": 15,
+      "unit": "bag",
+      "supplier": "Torrefazione Roma",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T15:04:44.276Z"
+    },
+    {
+      "id": "prod_tomatoes",
+      "businessId": "biz_mercato_pantry",
+      "name": "San Marzano Peeled Tomatoes (800g)",
+      "sku": "PAN-TOM-800",
+      "category": "Pantry",
+      "costPrice": 2.1,
+      "sellingPrice": 4.8,
+      "currentStock": 22,
+      "reorderPoint": 10,
+      "reorderQuantity": 30,
+      "unit": "can",
+      "supplier": "Campania Harvest",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-10T23:04:44.276Z"
+    },
+    {
+      "id": "prod_pasta",
+      "businessId": "biz_mercato_pantry",
+      "name": "Bronze-Cut Tagliatelle Pasta (500g)",
+      "sku": "PAN-PAS-500",
+      "category": "Pantry",
+      "costPrice": 2,
+      "sellingPrice": 5.2,
+      "currentStock": 18,
+      "reorderPoint": 10,
+      "reorderQuantity": 25,
+      "unit": "box",
+      "supplier": "Gragnano Artisans",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-10T23:04:44.276Z"
+    },
+    {
+      "id": "prod_truffle",
+      "businessId": "biz_mercato_pantry",
+      "name": "Black Truffle Butter (100g)",
+      "sku": "SPC-TRF-100",
+      "category": "Specialty",
+      "costPrice": 7,
+      "sellingPrice": 15.5,
+      "currentStock": 2,
+      "reorderPoint": 4,
+      "reorderQuantity": 10,
+      "unit": "jar",
+      "supplier": "Tartufi Piemonte",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-10T17:04:44.276Z"
+    },
+    {
+      "id": "prod_croissant",
+      "businessId": "biz_mercato_pantry",
+      "name": "Butter Croissant (Fresh Baked)",
+      "sku": "BAK-CRO-002",
+      "category": "Bakery",
+      "costPrice": 1.1,
+      "sellingPrice": 3.5,
+      "currentStock": 12,
+      "reorderPoint": 8,
+      "reorderQuantity": 24,
+      "unit": "piece",
+      "supplier": "Golden Hearth Bakehouse",
+      "isActive": true,
+      "createdAt": "2026-06-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T19:04:44.276Z"
+    },
+    {
+      "id": "prod_cafe_espresso",
+      "businessId": "biz_mercato_cafe",
+      "name": "Single Origin Espresso Shot",
+      "sku": "CAF-ESP-01",
+      "category": "Coffee",
+      "costPrice": 0.65,
+      "sellingPrice": 3.25,
+      "currentStock": 120,
+      "reorderPoint": 30,
+      "reorderQuantity": 100,
+      "unit": "cup",
+      "supplier": "Torrefazione Roma",
+      "isActive": true,
+      "createdAt": "2026-07-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T20:04:44.276Z"
+    },
+    {
+      "id": "prod_cafe_cappuccino",
+      "businessId": "biz_mercato_cafe",
+      "name": "Oat Milk Cappuccino",
+      "sku": "CAF-CAP-02",
+      "category": "Coffee",
+      "costPrice": 1.15,
+      "sellingPrice": 5,
+      "currentStock": 85,
+      "reorderPoint": 25,
+      "reorderQuantity": 80,
+      "unit": "cup",
+      "supplier": "Local Dairy & Plant Co.",
+      "isActive": true,
+      "createdAt": "2026-07-13T23:04:44.276Z",
+      "updatedAt": "2026-09-11T21:04:44.276Z"
+    }
+  ],
+  "movements": [
+    {
+      "businessId": "biz_mercato_pantry",
+      "productId": "prod_oil",
+      "productName": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "type": "restock",
+      "quantityDelta": 12,
+      "resultingStock": 15,
+      "referenceType": "expense",
+      "referenceId": "exp_1789167886191_twed",
+      "reason": "Restocked 12 bottles via Umbria Imports",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "id": "mov_1789167886191_ntpy",
+      "createdAt": "2026-09-11T23:04:46.191Z"
+    },
+    {
+      "id": "mov_01",
+      "businessId": "biz_mercato_pantry",
+      "productId": "prod_oil",
+      "productName": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "type": "restock",
+      "quantityDelta": 12,
+      "resultingStock": 15,
+      "referenceType": "expense",
+      "referenceId": "exp_init_oil",
+      "reason": "Regular weekly delivery from Umbria Imports",
+      "actorUserId": "user_elena",
+      "actorName": "Elena Bianchi",
+      "createdAt": "2026-09-08T23:04:44.276Z"
+    },
+    {
+      "id": "mov_02",
+      "businessId": "biz_mercato_pantry",
+      "productId": "prod_oil",
+      "productName": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "type": "sale",
+      "quantityDelta": -1,
+      "resultingStock": 3,
+      "referenceType": "transaction",
+      "referenceId": "tx_02",
+      "reason": "Sale recorded",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "createdAt": "2026-09-11T21:34:44.276Z"
+    },
+    {
+      "id": "mov_03",
+      "businessId": "biz_mercato_pantry",
+      "productId": "prod_truffle",
+      "productName": "Black Truffle Butter (100g)",
+      "type": "adjustment",
+      "quantityDelta": -1,
+      "resultingStock": 2,
+      "referenceType": "manual_adjustment",
+      "reason": "Damaged seal found during morning audit",
+      "actorUserId": "user_elena",
+      "actorName": "Elena Bianchi",
+      "createdAt": "2026-09-10T21:04:44.276Z"
+    },
+    {
+      "id": "mov_04",
+      "businessId": "biz_mercato_pantry",
+      "productId": "prod_bread",
+      "productName": "Artisan Country Sourdough Loaf",
+      "type": "sale",
+      "quantityDelta": -2,
+      "resultingStock": 7,
+      "referenceType": "transaction",
+      "referenceId": "tx_01",
+      "reason": "Sale recorded",
+      "actorUserId": "user_matteo",
+      "actorName": "Matteo Conti",
+      "createdAt": "2026-09-11T20:04:44.276Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_01",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_matteo",
+      "actorName": "Matteo Conti",
+      "type": "sale",
+      "subtotal": 35,
+      "tax": 0,
+      "totalAmount": 35,
+      "paymentMethod": "card",
+      "status": "completed",
+      "notes": "Customer requested whole sourdough un-sliced",
+      "createdAt": "2026-09-11T20:04:44.276Z",
+      "items": [
+        {
+          "id": "txi_01",
+          "transactionId": "tx_01",
+          "productId": "prod_bread",
+          "name": "Artisan Country Sourdough Loaf",
+          "quantity": 2,
+          "unitPrice": 6.5,
+          "costPrice": 2.2,
+          "subtotal": 13
+        },
+        {
+          "id": "txi_02",
+          "transactionId": "tx_01",
+          "productId": "prod_coffee",
+          "name": "Signature Espresso Roast Beans (1kg)",
+          "quantity": 1,
+          "unitPrice": 22,
+          "costPrice": 11,
+          "subtotal": 22
+        }
+      ]
+    },
+    {
+      "id": "tx_02",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "type": "sale",
+      "subtotal": 42.8,
+      "tax": 0,
+      "totalAmount": 42.8,
+      "paymentMethod": "cash",
+      "status": "completed",
+      "notes": "Pantry dinner recipe bundle",
+      "createdAt": "2026-09-11T21:34:44.276Z",
+      "items": [
+        {
+          "id": "txi_03",
+          "transactionId": "tx_02",
+          "productId": "prod_oil",
+          "name": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+          "quantity": 1,
+          "unitPrice": 18,
+          "costPrice": 9.5,
+          "subtotal": 18
+        },
+        {
+          "id": "txi_04",
+          "transactionId": "tx_02",
+          "productId": "prod_tomatoes",
+          "name": "San Marzano Peeled Tomatoes (800g)",
+          "quantity": 3,
+          "unitPrice": 4.8,
+          "costPrice": 2.1,
+          "subtotal": 14.4
+        },
+        {
+          "id": "txi_05",
+          "transactionId": "tx_02",
+          "productId": "prod_pasta",
+          "name": "Bronze-Cut Tagliatelle Pasta (500g)",
+          "quantity": 2,
+          "unitPrice": 5.2,
+          "costPrice": 2,
+          "subtotal": 10.4
+        }
+      ]
+    },
+    {
+      "id": "tx_03",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_elena",
+      "actorName": "Elena Bianchi",
+      "type": "sale",
+      "subtotal": 20.5,
+      "tax": 0,
+      "totalAmount": 20.5,
+      "paymentMethod": "digital",
+      "status": "completed",
+      "notes": "Morning pastry run",
+      "createdAt": "2026-09-11T22:16:44.276Z",
+      "items": [
+        {
+          "id": "txi_06",
+          "transactionId": "tx_03",
+          "productId": "prod_croissant",
+          "name": "Butter Croissant (Fresh Baked)",
+          "quantity": 4,
+          "unitPrice": 3.5,
+          "costPrice": 1.1,
+          "subtotal": 14
+        },
+        {
+          "id": "txi_07",
+          "transactionId": "tx_03",
+          "productId": "prod_bread",
+          "name": "Artisan Country Sourdough Loaf",
+          "quantity": 1,
+          "unitPrice": 6.5,
+          "costPrice": 2.2,
+          "subtotal": 6.5
+        }
+      ]
+    }
+  ],
+  "transactionItems": [
+    {
+      "id": "txi_01",
+      "transactionId": "tx_01",
+      "productId": "prod_bread",
+      "name": "Artisan Country Sourdough Loaf",
+      "quantity": 2,
+      "unitPrice": 6.5,
+      "costPrice": 2.2,
+      "subtotal": 13
+    },
+    {
+      "id": "txi_02",
+      "transactionId": "tx_01",
+      "productId": "prod_coffee",
+      "name": "Signature Espresso Roast Beans (1kg)",
+      "quantity": 1,
+      "unitPrice": 22,
+      "costPrice": 11,
+      "subtotal": 22
+    },
+    {
+      "id": "txi_03",
+      "transactionId": "tx_02",
+      "productId": "prod_oil",
+      "name": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "quantity": 1,
+      "unitPrice": 18,
+      "costPrice": 9.5,
+      "subtotal": 18
+    },
+    {
+      "id": "txi_04",
+      "transactionId": "tx_02",
+      "productId": "prod_tomatoes",
+      "name": "San Marzano Peeled Tomatoes (800g)",
+      "quantity": 3,
+      "unitPrice": 4.8,
+      "costPrice": 2.1,
+      "subtotal": 14.4
+    },
+    {
+      "id": "txi_05",
+      "transactionId": "tx_02",
+      "productId": "prod_pasta",
+      "name": "Bronze-Cut Tagliatelle Pasta (500g)",
+      "quantity": 2,
+      "unitPrice": 5.2,
+      "costPrice": 2,
+      "subtotal": 10.4
+    },
+    {
+      "id": "txi_06",
+      "transactionId": "tx_03",
+      "productId": "prod_croissant",
+      "name": "Butter Croissant (Fresh Baked)",
+      "quantity": 4,
+      "unitPrice": 3.5,
+      "costPrice": 1.1,
+      "subtotal": 14
+    },
+    {
+      "id": "txi_07",
+      "transactionId": "tx_03",
+      "productId": "prod_bread",
+      "name": "Artisan Country Sourdough Loaf",
+      "quantity": 1,
+      "unitPrice": 6.5,
+      "costPrice": 2.2,
+      "subtotal": 6.5
+    }
+  ],
+  "expenses": [
+    {
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "category": "inventory",
+      "amount": 132,
+      "vendor": "Umbria Imports",
+      "description": "Restocked 12 bottles of Extra Virgin Olive Oil (Cold Pressed 750ml) @ $11.00",
+      "paymentMethod": "card",
+      "status": "cleared",
+      "id": "exp_1789167886191_twed",
+      "createdAt": "2026-09-11T23:04:46.191Z"
+    },
+    {
+      "id": "exp_01",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "category": "inventory",
+      "amount": 110,
+      "vendor": "Golden Hearth Bakehouse",
+      "description": "Morning fresh bakery delivery (Sourdough & Croissants restock)",
+      "paymentMethod": "transfer",
+      "status": "cleared",
+      "createdAt": "2026-09-11T16:04:44.276Z"
+    },
+    {
+      "id": "exp_02",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_elena",
+      "actorName": "Elena Bianchi",
+      "category": "supplies",
+      "amount": 24.5,
+      "vendor": "EcoPackaging Direct",
+      "description": "Kraft paper carrier bags & greaseproof pastry wraps",
+      "paymentMethod": "card",
+      "status": "cleared",
+      "createdAt": "2026-09-11T03:04:44.276Z"
+    }
+  ],
+  "events": [
+    {
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "type": "RECOMMENDATION_ACCEPTED",
+      "title": "Recommendation Confirmed: Restock Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "detail": "Confirmed by Marco Rossi (owner). Executed action: restock_product.",
+      "metadata": {
+        "recommendationId": "rec_pantry_1",
+        "actionType": "restock_product",
+        "executionResult": {
+          "product": {
+            "id": "prod_oil",
+            "businessId": "biz_mercato_pantry",
+            "name": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+            "sku": "PAN-OIL-750",
+            "category": "Pantry",
+            "costPrice": 11,
+            "sellingPrice": 18,
+            "currentStock": 15,
+            "reorderPoint": 6,
+            "reorderQuantity": 18,
+            "unit": "bottle",
+            "supplier": "Umbria Imports Co.",
+            "isActive": true,
+            "createdAt": "2026-06-13T23:04:44.276Z",
+            "updatedAt": "2026-09-11T23:04:46.190Z"
+          },
+          "movement": {
+            "businessId": "biz_mercato_pantry",
+            "productId": "prod_oil",
+            "productName": "Extra Virgin Olive Oil (Cold Pressed 750ml)",
+            "type": "restock",
+            "quantityDelta": 12,
+            "resultingStock": 15,
+            "referenceType": "expense",
+            "referenceId": "exp_1789167886191_twed",
+            "reason": "Restocked 12 bottles via Umbria Imports",
+            "actorUserId": "user_marco",
+            "actorName": "Marco Rossi",
+            "id": "mov_1789167886191_ntpy",
+            "createdAt": "2026-09-11T23:04:46.191Z"
+          },
+          "expense": {
+            "businessId": "biz_mercato_pantry",
+            "actorUserId": "user_marco",
+            "actorName": "Marco Rossi",
+            "category": "inventory",
+            "amount": 132,
+            "vendor": "Umbria Imports",
+            "description": "Restocked 12 bottles of Extra Virgin Olive Oil (Cold Pressed 750ml) @ $11.00",
+            "paymentMethod": "card",
+            "status": "cleared",
+            "id": "exp_1789167886191_twed",
+            "createdAt": "2026-09-11T23:04:46.191Z"
+          },
+          "events": [
+            {
+              "businessId": "biz_mercato_pantry",
+              "actorUserId": "user_marco",
+              "actorName": "Marco Rossi",
+              "type": "EXPENSE_RECORDED",
+              "title": "Inventory Restock Expense: $132.00",
+              "detail": "Paid to Umbria Imports for 12x Extra Virgin Olive Oil (Cold Pressed 750ml).",
+              "metadata": {
+                "expenseId": "exp_1789167886191_twed",
+                "productId": "prod_oil",
+                "amount": 132
+              },
+              "severity": "normal",
+              "id": "evt_1789167886191_qi1l",
+              "createdAt": "2026-09-11T23:04:46.191Z"
+            },
+            {
+              "businessId": "biz_mercato_pantry",
+              "actorUserId": "user_marco",
+              "actorName": "Marco Rossi",
+              "type": "PRODUCT_RESTOCKED",
+              "title": "Product Restocked: Extra Virgin Olive Oil (Cold Pressed 750ml)",
+              "detail": "Added 12 bottles to stock (Total is now 15).",
+              "metadata": {
+                "productId": "prod_oil",
+                "quantityAdded": 12,
+                "previousStock": 3,
+                "resultingStock": 15,
+                "totalCost": 132
+              },
+              "severity": "positive",
+              "id": "evt_1789167886191_e136",
+              "createdAt": "2026-09-11T23:04:46.191Z"
+            }
+          ]
+        }
+      },
+      "severity": "positive",
+      "id": "evt_1789167886192_cqnj",
+      "createdAt": "2026-09-11T23:04:46.192Z"
+    },
+    {
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "type": "PRODUCT_RESTOCKED",
+      "title": "Product Restocked: Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "detail": "Added 12 bottles to stock (Total is now 15).",
+      "metadata": {
+        "productId": "prod_oil",
+        "quantityAdded": 12,
+        "previousStock": 3,
+        "resultingStock": 15,
+        "totalCost": 132
+      },
+      "severity": "positive",
+      "id": "evt_1789167886191_e136",
+      "createdAt": "2026-09-11T23:04:46.191Z"
+    },
+    {
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "type": "EXPENSE_RECORDED",
+      "title": "Inventory Restock Expense: $132.00",
+      "detail": "Paid to Umbria Imports for 12x Extra Virgin Olive Oil (Cold Pressed 750ml).",
+      "metadata": {
+        "expenseId": "exp_1789167886191_twed",
+        "productId": "prod_oil",
+        "amount": 132
+      },
+      "severity": "normal",
+      "id": "evt_1789167886191_qi1l",
+      "createdAt": "2026-09-11T23:04:46.191Z"
+    },
+    {
+      "id": "evt_01",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "type": "STOCK_ADJUSTED",
+      "title": "Low Stock Threshold Reached",
+      "detail": "Extra Virgin Olive Oil inventory dropped to 3 bottles (Reorder point: 6).",
+      "metadata": {
+        "productId": "prod_oil",
+        "remainingStock": 3,
+        "reorderPoint": 6
+      },
+      "severity": "warning",
+      "createdAt": "2026-09-11T21:34:44.276Z"
+    },
+    {
+      "id": "evt_02",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_marco",
+      "actorName": "Marco Rossi",
+      "type": "SALE_RECORDED",
+      "title": "Cash Sale Completed: $42.80",
+      "detail": "Processed checkout with 3 items (EVOO, San Marzano Tomatoes, Tagliatelle).",
+      "metadata": {
+        "transactionId": "tx_02",
+        "totalAmount": 42.8,
+        "paymentMethod": "cash"
+      },
+      "severity": "positive",
+      "createdAt": "2026-09-11T21:34:44.276Z"
+    },
+    {
+      "id": "evt_03",
+      "businessId": "biz_mercato_pantry",
+      "actorUserId": "user_elena",
+      "actorName": "Elena Bianchi",
+      "type": "PRODUCT_RESTOCKED",
+      "title": "Inventory Restocked: Extra Virgin Olive Oil",
+      "detail": "Added 12 bottles to inventory ledger from Umbria Imports delivery.",
+      "metadata": {
+        "productId": "prod_oil",
+        "quantityAdded": 12,
+        "resultingStock": 15
+      },
+      "severity": "positive",
+      "createdAt": "2026-09-08T23:04:44.276Z"
+    }
+  ],
+  "memories": [
+    {
+      "id": "mem_pantry_1",
+      "businessId": "biz_mercato_pantry",
+      "fact": "Peak demand for premium extra virgin olive oil and pasta occurs on Thursday and Friday afternoons before the weekend.",
+      "type": "customer_preference",
+      "confidence": 0.95,
+      "source": "observation",
+      "status": "active",
+      "createdAt": "2026-09-01T23:04:44.276Z",
+      "lastReferencedAt": "2026-09-11T11:04:44.276Z"
+    },
+    {
+      "id": "mem_pantry_2",
+      "businessId": "biz_mercato_pantry",
+      "fact": "Parmigiano Reggiano 24-month rounds take 3-4 business days for refrigerated delivery from Parma Imports.",
+      "type": "supplier_pattern",
+      "confidence": 0.9,
+      "source": "manual",
+      "status": "active",
+      "createdAt": "2026-08-30T11:04:44.276Z",
+      "lastReferencedAt": "2026-09-10T23:04:44.276Z"
+    },
+    {
+      "id": "mem_pantry_3",
+      "businessId": "biz_mercato_pantry",
+      "fact": "Dry pasta sales increase by ~30% whenever artisanal tomato passata is displayed nearby.",
+      "type": "operating_rhythm",
+      "confidence": 0.85,
+      "source": "observation",
+      "status": "active",
+      "createdAt": "2026-09-04T11:04:44.276Z",
+      "lastReferencedAt": "2026-09-09T23:04:44.276Z"
+    },
+    {
+      "id": "mem_cafe_1",
+      "businessId": "biz_mercato_cafe",
+      "fact": "Morning rush between 7:30 AM and 9:30 AM drives 65% of daily espresso bean consumption.",
+      "type": "operating_rhythm",
+      "confidence": 0.95,
+      "source": "observation",
+      "status": "active",
+      "createdAt": "2026-09-03T15:04:44.276Z",
+      "lastReferencedAt": "2026-09-11T17:04:44.276Z"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec_pantry_1",
+      "businessId": "biz_mercato_pantry",
+      "type": "inventory_restock",
+      "title": "Restock Extra Virgin Olive Oil (Cold Pressed 750ml)",
+      "explanation": "Current stock is down to 3 bottles, breaching the safety reorder threshold of 6. High weekend demand projected.",
+      "priority": "high",
+      "recommendedAction": "Restock 12 bottles from Umbria Imports to ensure stock availability.",
+      "actionType": "restock_product",
+      "actionPayload": {
+        "productId": "prod_oil",
+        "quantity": 12,
+        "costPrice": 11,
+        "vendor": "Umbria Imports",
+        "recordExpense": true,
+        "paymentMethod": "card"
+      },
+      "evidence": [
+        "Current stock: 3 bottles",
+        "Reorder point: 6 bottles",
+        "Weekend olive oil demand surge identified in store memories"
+      ],
+      "status": "accepted",
+      "createdAt": "2026-09-11T19:04:44.276Z",
+      "confirmedByUserId": "user_marco",
+      "confirmedAt": "2026-09-11T23:04:46.192Z"
+    }
+  ]
+}

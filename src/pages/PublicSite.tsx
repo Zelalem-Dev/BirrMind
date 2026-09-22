@@ -12,7 +12,6 @@ export function PublicSite() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <Logo className="w-8 h-8 text-amber-600" />
-              <span className="font-serif font-bold text-xl tracking-tight text-stone-900">BirrMind</span>
             </div>
             <div className="flex items-center gap-4">
               <Link to="/auth" className="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">
@@ -92,7 +91,6 @@ export function PublicSite() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <Logo className="w-6 h-6 text-stone-500" />
-            <span className="font-serif font-bold text-lg text-stone-300">BirrMind</span>
           </div>
           <div className="text-sm">
             &copy; {new Date().getFullYear()} BirrMind Technologies. Crafted for Ethiopian Businesses.

@@ -17,8 +17,25 @@ import {
   BusinessContextForAI,
 } from '../types/index.js';
 
+import { supabase } from './supabaseClient.js';
+
 let currentUserId = 'user_marco';
 let currentBusinessId = 'biz_mercato_pantry';
+let currentAuthToken: string | null = null;
+
+if (supabase) {
+  supabase.auth.getSession().then(({ data }) => {
+    currentAuthToken = data.session?.access_token || null;
+  }).catch(() => {});
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentAuthToken = session?.access_token || null;
+  });
+}
+
+export function setAuthToken(token: string | null) {
+  currentAuthToken = token;
+}
 
 export function setApiContext(userId?: string, businessId?: string) {
   if (userId) currentUserId = userId;
@@ -30,11 +47,18 @@ export function getApiContext() {
 }
 
 const getHeaders = (userId?: string, businessId?: string): HeadersInit => {
-  const headers: HeadersInit = {
+  const isDemo = typeof window !== 'undefined' && localStorage.getItem('birrmind_demo_mode') === 'true';
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'x-user-id': userId || currentUserId,
     'x-business-id': businessId || currentBusinessId,
   };
+  if (currentAuthToken) {
+    headers['Authorization'] = `Bearer ${currentAuthToken}`;
+  }
+  if (isDemo) {
+    headers['x-demo-mode'] = 'true';
+  }
   return headers;
 };
 

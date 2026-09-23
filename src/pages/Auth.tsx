@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
 import { Logo } from '../components/brand/Logo.js';
-import { supabase } from '../lib/supabaseClient.js';
+import { supabase, isSupabaseReady } from '../lib/supabaseClient.js';
 // Fallback for development if Supabase isn't configured
 import { DEMO_USERS } from './Dashboard.js';
 
@@ -20,10 +20,10 @@ export function Auth() {
     setError(null);
 
     try {
-      if (!supabase) {
-        // Fallback for local sandbox without Supabase keys
-        console.warn('Supabase not configured, falling back to local demo login');
-        // Just navigate to app (which defaults to marco)
+      if (!supabase || !isSupabaseReady) {
+        console.warn('[Auth] Supabase not configured. Entering Demo mode.');
+        localStorage.setItem('birrmind_demo_mode', 'true');
+        window.dispatchEvent(new Event('storage'));
         navigate('/app');
         return;
       }
@@ -34,7 +34,8 @@ export function Auth() {
           password,
         });
         if (signUpError) throw signUpError;
-        // Proceed to app or show confirmation
+        localStorage.removeItem('birrmind_demo_mode');
+        window.dispatchEvent(new Event('storage'));
         navigate('/app');
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -42,6 +43,8 @@ export function Auth() {
           password,
         });
         if (signInError) throw signInError;
+        localStorage.removeItem('birrmind_demo_mode');
+        window.dispatchEvent(new Event('storage'));
         navigate('/app');
       }
     } catch (err: any) {
@@ -128,18 +131,32 @@ export function Auth() {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col gap-3">
               <button
+                type="button"
                 onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
                 className="w-full inline-flex justify-center py-2 px-4 border border-stone-300 rounded-lg shadow-sm bg-white text-sm font-medium text-stone-700 hover:bg-stone-50 transition-colors"
               >
                 {mode === 'signin' ? 'Create a new account' : 'Sign in to existing account'}
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.setItem('birrmind_demo_mode', 'true');
+                  window.dispatchEvent(new Event('storage'));
+                  navigate('/app');
+                }}
+                className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-amber-300 rounded-lg shadow-sm bg-amber-50 text-sm font-semibold text-amber-900 hover:bg-amber-100 transition-colors"
+              >
+                Explore Demo Account (Instant Access)
+              </button>
             </div>
             
-            {!supabase && (
-              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 text-center">
-                <strong>Demo Mode Active:</strong> Supabase keys not found in environment. Any login will bypass authentication.
+            {!isSupabaseReady && (
+              <div className="mt-6 p-4 bg-amber-50/80 border border-amber-200 rounded-lg text-xs text-amber-800 text-center space-y-1">
+                <p className="font-semibold">Notice: Supabase Keys Not Yet Connected on Render</p>
+                <p>Click <strong>Explore Demo Account</strong> above to test all features immediately, or configure Supabase environment variables in Render to enable persistent cloud logins.</p>
               </div>
             )}
           </div>

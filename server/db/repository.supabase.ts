@@ -90,6 +90,42 @@ export class SupabaseRepository {
     }));
   }
 
+  public async createBusiness(params: {
+    name: string;
+    type?: string;
+    currency?: string;
+    currencySymbol?: string;
+    targetDailyRevenue?: number;
+    operatingHours?: string;
+  }): Promise<Business> {
+    const id = 'biz_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    const slug = params.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id.slice(-4);
+    const { data, error } = await this.db.from('businesses').insert({
+      id,
+      name: params.name,
+      slug,
+      type: params.type || 'retail',
+      currency: params.currency || 'ETB',
+      currency_symbol: params.currencySymbol || 'ETB',
+      target_daily_revenue: params.targetDailyRevenue || 1000,
+      operating_hours: params.operatingHours || '8:00 AM - 8:00 PM',
+    }).select().single();
+
+    if (error) throw error;
+    return {
+      id: data.id,
+      name: data.name,
+      slug: data.slug,
+      type: data.type,
+      currency: data.currency,
+      currencySymbol: data.currency_symbol,
+      targetDailyRevenue: data.target_daily_revenue,
+      operatingHours: data.operating_hours,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
+  }
+
   public async getMembership(userId: string, businessId: string): Promise<BusinessMembership | null> {
     const { data, error } = await this.db
       .from('business_memberships')
@@ -133,9 +169,10 @@ export class SupabaseRepository {
   }
 
   public async createMembership(params: { userId: string; businessId: string; role: MembershipRole }): Promise<BusinessMembership> {
+    const id = `bm_${params.userId.replace(/[^a-zA-Z0-9]/g, '').slice(-8)}_${params.businessId.replace(/[^a-zA-Z0-9]/g, '').slice(-8)}_${Math.random().toString(36).substring(2, 6)}`;
     const { data, error } = await this.db
       .from('business_memberships')
-      .upsert({ user_id: params.userId, business_id: params.businessId, role: params.role })
+      .upsert({ id, user_id: params.userId, business_id: params.businessId, role: params.role })
       .select()
       .single();
     

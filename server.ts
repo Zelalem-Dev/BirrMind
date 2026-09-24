@@ -70,7 +70,7 @@ app.get('/api/health', (req, res) => {
       engine: isSupabaseConfigured() ? 'supabase_postgresql' : 'local_postgres_compatible',
       configured: isSupabaseConfigured(),
     },
-    version: '1.0.0-phase1',
+    version: '1.0.0',
   });
 });
 
@@ -97,6 +97,100 @@ app.get('/api/businesses', requireAuth, async (req, res) => {
     res.json(businesses);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// 3b. Complete First-Time Business Onboarding
+app.post('/api/onboarding/complete', requireAuth, async (req, res) => {
+  try {
+    const user = req.user!;
+    const data = req.body;
+
+    if (!data.businessName || data.businessName.trim().length < 2) {
+      res.status(400).json({ error: 'Business name must be at least 2 characters.' });
+      return;
+    }
+
+    const business = await repository.createBusiness({
+      name: data.businessName.trim(),
+      type: data.businessType || 'retail',
+      currency: data.currency || 'ETB',
+      currencySymbol: data.currencySymbol || 'ETB',
+      targetDailyRevenue: 1000,
+      operatingHours: '8:00 AM - 8:00 PM',
+    });
+
+    const membership = await repository.createMembership({
+      userId: user.id,
+      businessId: business.id,
+      role: 'owner',
+    });
+
+    // Record initial workspace business event
+    try {
+      await repository.createBusinessEvent({
+        businessId: business.id,
+        actorUserId: user.id,
+        actorName: user.fullName,
+        type: 'BUSINESS_WORKSPACE_CREATED',
+        title: 'Business Workspace Initialized',
+        detail: `${business.name} (${data.businessType || 'Business'}) workspace created in ${data.city || 'Addis Ababa'}.`,
+        metadata: {
+          city: data.city,
+          country: data.country || 'Ethiopia',
+          industry: data.industry,
+          goals: data.businessGoals,
+        },
+        severity: 'positive',
+      });
+    } catch (evtErr) {
+      console.warn('Initial event note:', evtErr);
+    }
+
+    // Initialize Mercato AI memories with business context
+    try {
+      if (data.businessGoals && Array.isArray(data.businessGoals) && data.businessGoals.length > 0) {
+        await repository.createMemory({
+          businessId: business.id,
+          fact: `Core business priorities: ${data.businessGoals.join(', ')}.`,
+          type: 'operating_rhythm',
+          confidence: 0.95,
+          source: 'onboarding',
+          status: 'active',
+        });
+      }
+      if (data.paymentMethods && Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) {
+        await repository.createMemory({
+          businessId: business.id,
+          fact: `Accepted payment methods: ${data.paymentMethods.join(', ')}.`,
+          type: 'customer_preference',
+          confidence: 0.95,
+          source: 'onboarding',
+          status: 'active',
+        });
+      }
+      if (data.city) {
+        await repository.createMemory({
+          businessId: business.id,
+          fact: `Business located in ${data.city}${data.neighborhood ? ', ' + data.neighborhood : ''}, ${data.country || 'Ethiopia'}.`,
+          type: 'operating_rhythm',
+          confidence: 1.0,
+          source: 'onboarding',
+          status: 'active',
+        });
+      }
+    } catch (memErr) {
+      console.warn('Initial memory note:', memErr);
+    }
+
+    res.status(201).json({
+      success: true,
+      business,
+      membership,
+    });
+  } catch (err: any) {
+    console.error('Onboarding completion error:', err);
+    res.status(500).json({ error: err.message || 'Failed to complete onboarding' });
   }
 });
 

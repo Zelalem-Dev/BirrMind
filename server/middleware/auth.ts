@@ -77,28 +77,20 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
           try {
             if ((repository as any).state?.users) {
-              (repository as any).state.users.push(newUser);
-              (repository as any).state.memberships.push({
-                id: `bm_${newUser.id}_${DEFAULT_BUSINESS_ID}`,
-                userId: newUser.id,
-                businessId: DEFAULT_BUSINESS_ID,
-                role: 'owner',
-                joinedAt: new Date().toISOString(),
-              });
+              const existingIdx = (repository as any).state.users.findIndex((u: User) => u.id === newUser.id);
+              if (existingIdx >= 0) {
+                (repository as any).state.users[existingIdx] = newUser;
+              } else {
+                (repository as any).state.users.push(newUser);
+              }
               (repository as any).persist?.();
               user = newUser;
-            } else if ((repository as any).client) {
-              await (repository as any).client.from('users').upsert({
+            } else if ((repository as any).db) {
+              await (repository as any).db.from('users').upsert({
                 id: newUser.id,
                 email: newUser.email,
                 full_name: newUser.fullName,
                 avatar_url: newUser.avatarUrl,
-              });
-              await (repository as any).client.from('business_memberships').upsert({
-                id: `bm_${newUser.id}_${DEFAULT_BUSINESS_ID}`,
-                user_id: newUser.id,
-                business_id: DEFAULT_BUSINESS_ID,
-                role: 'owner',
               });
               user = newUser;
             }

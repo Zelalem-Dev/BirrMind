@@ -7,11 +7,17 @@ function getSupabaseKey() {
   return process.env.SUPABASE_SECRET_KEY || 
          process.env.SUPABASE_SERVICE_ROLE_KEY || 
          process.env.SUPABASE_PUBLISHABLE_KEY || 
-         process.env.SUPABASE_ANON_KEY;
+         process.env.SUPABASE_ANON_KEY ||
+         process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+         process.env.VITE_SUPABASE_ANON_KEY;
+}
+
+function getSupabaseUrl() {
+  return process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 }
 
 export function getSupabaseClient(): SupabaseClient | null {
-  const url = process.env.SUPABASE_URL;
+  const url = getSupabaseUrl();
   const key = getSupabaseKey();
 
   if (!url || !key || url.includes('MY_') || url === '') {
@@ -37,7 +43,7 @@ export function getSupabaseClient(): SupabaseClient | null {
 }
 
 export function isSupabaseConfigured(): boolean {
-  const url = process.env.SUPABASE_URL;
+  const url = getSupabaseUrl();
   const key = getSupabaseKey();
   return Boolean(url && key && !url.includes('MY_') && url.trim() !== '');
 }

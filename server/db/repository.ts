@@ -701,6 +701,34 @@ class DatabaseRepository {
     return this.state.businesses.find(b => b.id === businessId) || null;
   }
 
+  public async createBusiness(params: {
+    name: string;
+    type?: string;
+    currency?: string;
+    currencySymbol?: string;
+    targetDailyRevenue?: number;
+    operatingHours?: string;
+  }): Promise<Business> {
+    const now = new Date().toISOString();
+    const id = 'biz_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    const slug = params.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id.slice(-4);
+    const newBiz: Business = {
+      id,
+      name: params.name,
+      slug,
+      type: params.type || 'retail',
+      currency: params.currency || 'ETB',
+      currencySymbol: params.currencySymbol || 'ETB',
+      targetDailyRevenue: params.targetDailyRevenue || 1000,
+      operatingHours: params.operatingHours || '8:00 AM - 8:00 PM',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.state.businesses.push(newBiz);
+    this.persist();
+    return newBiz;
+  }
+
   public async listUserBusinesses(userId: string): Promise<{ business: Business; role: MembershipRole }[]> {
     const userMemberships = this.state.memberships.filter(m => m.userId === userId);
     const result: { business: Business; role: MembershipRole }[] = [];

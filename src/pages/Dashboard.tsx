@@ -3,10 +3,9 @@ import {
   AlertCircle,
   CheckCircle2,
   RefreshCw,
-  Database,
-  Building2,
-  ShieldCheck,
-  RotateCcw
+  Store,
+  Sparkles,
+  Bot
 } from 'lucide-react';
 import {
   Business,
@@ -29,8 +28,13 @@ import { InventoryLedgerTab } from '../components/inventory/InventoryLedgerTab.j
 import { ExpensesTab } from '../components/expenses/ExpensesTab.js';
 import { EventsAuditTab } from '../components/events/EventsAuditTab.js';
 import { TeamTab } from '../components/team/TeamTab.js';
+import { MarketPulseTab } from '../components/dashboard/MarketPulseTab.js';
+import { MercatoAITab } from '../components/dashboard/MercatoAITab.js';
+import { CopilotDrawer } from '../components/copilot/CopilotDrawer.js';
+import { SubscriptionModal } from '../components/billing/SubscriptionModal.js';
+import { Logo } from '../components/brand/Logo.js';
 
-// Pre-seeded multi-tenant demo users for switching RBAC roles
+// Pre-seeded multi-tenant demo users for switching RBAC roles in development demo mode
 export const DEMO_USERS = [
   { id: 'user_marco', name: 'Marco Rossi', role: 'Owner', email: 'marco@mercatopantry.com' },
   { id: 'user_elena', name: 'Elena Bianchi', role: 'Manager', email: 'elena@mercatopantry.com' },
@@ -38,13 +42,17 @@ export const DEMO_USERS = [
 ];
 
 export function Dashboard() {
-  const [currentUserId, setCurrentUserId] = useState<string>('user_marco');
-  const [currentBusinessId, setCurrentBusinessId] = useState<string>('biz_mercato_pantry');
+  const isDemo = typeof window !== 'undefined' && localStorage.getItem('birrmind_demo_mode') === 'true';
+
+  const [currentUserId, setCurrentUserId] = useState<string>(isDemo ? 'user_marco' : '');
+  const [currentBusinessId, setCurrentBusinessId] = useState<string>(isDemo ? 'biz_mercato_pantry' : '');
   const [state, setState] = useState<BusinessStateSnapshot | null>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'alert' } | null>(null);
+  const [isCopilotDrawerOpen, setIsCopilotDrawerOpen] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   const showToast = (text: string, type: 'success' | 'alert' = 'success') => {
     setToastMessage({ text, type });
@@ -53,7 +61,8 @@ export function Dashboard() {
     }, 4000);
   };
 
-  const loadData = async (userId = currentUserId, businessId = currentBusinessId) => {
+  const loadData = async (userId: string, businessId: string) => {
+    if (!userId || !businessId) return;
     try {
       setError(null);
       setApiContext(userId, businessId);
@@ -61,39 +70,77 @@ export function Dashboard() {
       setState(snapshot);
     } catch (err: any) {
       console.error('Failed to load state:', err);
-      // Invalidate state on tenant access error to prevent displaying stale cross-tenant data
       setState(null);
-      setError(err.message || 'Unable to connect to Mercato server');
+      setError(err.message || 'Unable to connect to BirrMind workspace');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData(currentUserId, currentBusinessId);
-  }, [currentUserId, currentBusinessId]);
+    let isMounted = true;
+    const initWorkspace = async () => {
+      try {
+        const isDemoActive = typeof window !== 'undefined' && localStorage.getItem('birrmind_demo_mode') === 'true';
+
+        if (!isDemoActive) {
+          const me = await api.getMe();
+          if (!isMounted) return;
+
+          if (me.user?.id) {
+            setCurrentUserId(me.user.id);
+          }
+
+          if (me.accessibleBusinesses && me.accessibleBusinesses.length > 0) {
+            const targetBiz = me.defaultBusinessId || me.accessibleBusinesses[0].business.id;
+            setCurrentBusinessId(targetBiz);
+            loadData(me.user.id, targetBiz);
+            return;
+          }
+        }
+
+        // Demo mode or fallback
+        const demoUid = currentUserId || 'user_marco';
+        const demoBizId = currentBusinessId || 'biz_mercato_pantry';
+        setCurrentUserId(demoUid);
+        setCurrentBusinessId(demoBizId);
+        loadData(demoUid, demoBizId);
+      } catch (err: any) {
+        console.warn('Workspace initialization note:', err);
+        const fallbackUid = currentUserId || 'user_marco';
+        const fallbackBizId = currentBusinessId || 'biz_mercato_pantry';
+        loadData(fallbackUid, fallbackBizId);
+      }
+    };
+
+    initWorkspace();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleSelectBusiness = (newBizId: string) => {
     setCurrentBusinessId(newBizId);
-    showToast(`Switched active business to ${newBizId}`);
+    loadData(currentUserId, newBizId);
+    showToast(`Switched workspace to ${newBizId}`);
   };
 
   const handleSelectUser = async (newUserId: string) => {
     setCurrentUserId(newUserId);
-    const user = DEMO_USERS.find(u => u.id === newUserId);
+    const demoUser = DEMO_USERS.find(u => u.id === newUserId);
     try {
       const me = await api.getMe(newUserId);
       const hasAccess = me.accessibleBusinesses.some(b => b.business.id === currentBusinessId);
       if (!hasAccess && me.accessibleBusinesses.length > 0) {
         const fallbackBizId = me.defaultBusinessId || me.accessibleBusinesses[0].business.id;
         setCurrentBusinessId(fallbackBizId);
-        showToast(`Switched user to ${user?.name || newUserId} (${user?.role}) • Switched tenant to ${me.accessibleBusinesses[0].business.name}`);
+        loadData(newUserId, fallbackBizId);
+        showToast(`Switched to ${demoUser?.name || newUserId} (${demoUser?.role})`);
         return;
       }
     } catch {
-      // Fall through to standard toast
+      // Fall through
     }
-    showToast(`Switched user context to ${user?.name || newUserId} (${user?.role})`);
+    loadData(newUserId, currentBusinessId);
+    showToast(`Switched user context to ${demoUser?.name || newUserId} (${demoUser?.role})`);
   };
 
   const handleResetDemo = async () => {
@@ -111,12 +158,12 @@ export function Dashboard() {
 
   if (loading && !state) {
     return (
-      <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 rounded-xl bg-amber-600 flex items-center justify-center text-white font-serif font-bold text-2xl shadow-md mb-4 animate-pulse">
+      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center text-white font-serif font-bold text-2xl shadow-lg mb-4 animate-pulse">
           M
         </div>
-        <p className="font-serif font-bold text-lg text-stone-800">Initializing Mercato AI Foundation...</p>
-        <p className="text-xs text-stone-500 mt-1">Connecting to Multi-Tenant PostgreSQL Repository</p>
+        <p className="font-serif font-bold text-lg text-stone-900">Loading BirrMind Workspace...</p>
+        <p className="text-xs text-stone-500 mt-1">Connecting to your business companion</p>
       </div>
     );
   }
@@ -124,28 +171,31 @@ export function Dashboard() {
   if (error && !state) {
     const isTenantDenied = error.includes('Forbidden') || error.includes('TENANT_ACCESS_DENIED') || error.includes('not an authorized member');
     return (
-      <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center p-4">
-        <div className="bg-white rounded-xl border border-rose-200 p-6 max-w-md w-full shadow-lg text-center">
-          <AlertCircle className="w-10 h-10 text-rose-600 mx-auto mb-3" />
+      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 max-w-md w-full shadow-lg text-center">
+          <AlertCircle className="w-10 h-10 text-amber-600 mx-auto mb-3" />
           <h2 className="font-serif font-bold text-lg text-stone-900">
-            {isTenantDenied ? 'Tenant Access Denied' : 'Connection Error'}
+            {isTenantDenied ? 'Workspace Access Protected' : 'Connection Notice'}
           </h2>
-          <p className="text-xs text-stone-600 mt-2">{error}</p>
-          <div className="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
+          <p className="text-xs text-stone-600 mt-2 leading-relaxed">{error}</p>
+          <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
             {isTenantDenied ? (
               <button
                 onClick={() => {
-                  setCurrentBusinessId('biz_mercato_pantry');
-                  setError(null);
+                  if (state?.accessibleBusinesses && state.accessibleBusinesses.length > 0) {
+                    handleSelectBusiness(state.accessibleBusinesses[0].business.id);
+                  } else {
+                    window.location.href = '/onboarding';
+                  }
                 }}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors"
               >
-                Switch to Authorized Business
+                Go to My Business
               </button>
             ) : (
               <button
-                onClick={() => loadData()}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors"
+                onClick={() => loadData(currentUserId, currentBusinessId)}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors"
               >
                 Retry Connection
               </button>
@@ -193,6 +243,8 @@ export function Dashboard() {
         onResetDemo={handleResetDemo}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onOpenUpgrade={() => setIsUpgradeModalOpen(true)}
+        onOpenSettings={() => setActiveTab('team')}
       />
 
       {/* Main Content Area */}
@@ -205,7 +257,7 @@ export function Dashboard() {
             health={state.health}
             events={state.events}
             onNavigateTab={setActiveTab}
-            onRefresh={() => loadData()}
+            onRefresh={() => loadData(currentUserId, currentBusinessId)}
           />
         )}
 
@@ -215,7 +267,7 @@ export function Dashboard() {
             products={state.products}
             transactions={state.transactions}
             onSaleCompleted={() => {
-              loadData();
+              loadData(currentUserId, currentBusinessId);
               showToast('Sale successfully processed and inventory updated');
             }}
           />
@@ -228,10 +280,14 @@ export function Dashboard() {
             products={state.products}
             movements={state.movements}
             onDataChanged={() => {
-              loadData();
+              loadData(currentUserId, currentBusinessId);
               showToast('Inventory updated');
             }}
           />
+        )}
+
+        {activeTab === 'market-pulse' && (
+          <MarketPulseTab business={state.business} />
         )}
 
         {activeTab === 'expenses' && (
@@ -240,9 +296,20 @@ export function Dashboard() {
             membership={state.membership}
             expenses={state.expenses}
             onExpenseLogged={() => {
-              loadData();
+              loadData(currentUserId, currentBusinessId);
               showToast('Expense recorded in ledger');
             }}
+          />
+        )}
+
+        {activeTab === 'copilot' && (
+          <MercatoAITab
+            business={state.business}
+            user={state.user}
+            health={state.health}
+            products={state.products}
+            onNavigateTab={setActiveTab}
+            onRefreshData={() => loadData(currentUserId, currentBusinessId)}
           />
         )}
 
@@ -261,24 +328,53 @@ export function Dashboard() {
             memberships={state.memberships}
             databaseEngine={state.databaseEngine}
             onMemberAdded={() => {
-              loadData();
+              loadData(currentUserId, currentBusinessId);
               showToast('Team membership granted');
             }}
           />
         )}
       </main>
 
-      {/* Footer */}
+      {/* Floating Mercato AI Quick Assistant Button */}
+      {activeTab !== 'copilot' && (
+        <button
+          id="floating-mercato-ai-btn"
+          onClick={() => setIsCopilotDrawerOpen(true)}
+          className="fixed bottom-6 right-6 z-40 px-4 py-3 bg-stone-900 hover:bg-stone-800 text-white rounded-full shadow-2xl flex items-center gap-2.5 border border-stone-700 transition-all hover:scale-105 active:scale-95 group"
+          title="Ask Mercato AI anytime"
+        >
+          <div className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            M
+          </div>
+          <span className="text-xs font-bold tracking-tight">Ask Mercato AI</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform" />
+        </button>
+      )}
+
+      {/* Globally Accessible Copilot Drawer */}
+      <CopilotDrawer
+        isOpen={isCopilotDrawerOpen}
+        onClose={() => setIsCopilotDrawerOpen(false)}
+        business={state.business}
+        user={state.user}
+      />
+
+      {/* Subscription & Upgrade Modal */}
+      <SubscriptionModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        business={state.business}
+      />
+
+      {/* Clean User-Facing SaaS Footer (No Developer Jargon) */}
       <footer className="border-t border-stone-200 bg-white py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
           <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-stone-800">Mercato AI</span>
-            <span>• Phase 1 Multi-Tenant PostgreSQL Foundation</span>
+            <span className="font-serif font-bold text-stone-900">BirrMind</span>
+            <span>• Powered by Mercato AI</span>
           </div>
-          <div className="flex items-center gap-4 text-[11px] font-mono">
-            <span>Database: {state.databaseEngine}</span>
-            <span>RLS: Enabled</span>
-            <span>Tenant: {state.business.id}</span>
+          <div className="text-[11px] text-stone-400">
+            Intelligent operating companion for Ethiopian small businesses • © 2026 BirrMind
           </div>
         </div>
       </footer>

@@ -69,16 +69,16 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
       <div className="bg-white rounded-xl border border-stone-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
-              Active Tenant
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+              {business.type ? business.type.charAt(0).toUpperCase() + business.type.slice(1) : 'Business Workspace'}
             </span>
-            <span className="text-xs text-stone-500 font-mono">ID: {business.id}</span>
+            <span className="text-xs text-stone-500 font-medium">{business.currency} • Daily Target: {business.currencySymbol}{business.targetDailyRevenue}</span>
           </div>
-          <h1 className="font-serif font-bold text-2xl text-stone-900 mt-1">
+          <h1 className="font-serif font-bold text-2xl text-stone-900 mt-1.5">
             {business.name}
           </h1>
-          <p className="text-sm text-stone-600 mt-0.5">
-            Operating as <span className="font-semibold text-stone-800">{user.fullName}</span> ({membership.role.toUpperCase()}) • Target: {business.currencySymbol}{business.targetDailyRevenue}/day
+          <p className="text-xs text-stone-600 mt-0.5">
+            Signed in as <span className="font-semibold text-stone-800">{user.fullName}</span> ({membership.role.toUpperCase()})
           </p>
         </div>
 
@@ -86,31 +86,31 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           <button
             id="quick-pos-btn"
             onClick={() => onNavigateTab('pos')}
-            className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-xs transition-colors"
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
           >
             <ShoppingCart className="w-3.5 h-3.5" />
-            <span>New Sale</span>
+            <span>Record Sale</span>
           </button>
           <button
             id="quick-inventory-btn"
             onClick={() => onNavigateTab('inventory')}
-            className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors hidden sm:flex"
+            className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors hidden sm:flex"
           >
             <PackageCheck className="w-3.5 h-3.5" />
-            <span>Ledger</span>
+            <span>Inventory</span>
           </button>
           <button
             onClick={() => onNavigateTab('market-pulse')}
-            className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
+            className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
             <span>Market Pulse</span>
           </button>
           <button
             id="refresh-overview-btn"
             onClick={onRefresh}
-            className="p-2 text-stone-500 hover:text-stone-800 hover:bg-stone-100 rounded-lg border border-stone-200 transition-colors"
-            title="Refresh telemetry"
+            className="p-2 text-stone-500 hover:text-stone-800 hover:bg-stone-100 rounded-xl border border-stone-200 transition-colors"
+            title="Refresh business data"
           >
             <RotateCw className="w-4 h-4" />
           </button>
@@ -269,38 +269,75 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
         </div>
 
-        {/* Right 1 Col: Multi-Tenant Architecture & Data Rules */}
-        <div className="bg-stone-50 rounded-xl border border-stone-200 p-5 space-y-4">
-          <div>
-            <h3 className="font-serif font-bold text-sm text-stone-900 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-amber-700" />
-              <span>Phase 1 Architecture</span>
-            </h3>
-            <p className="text-xs text-stone-600 mt-1">
-              Engineered with strict tenant isolation, deterministic business calculations, and an immutable inventory ledger.
-            </p>
+        {/* Right 1 Col: Mercato AI Executive Briefing & Actionable Recommendations */}
+        <div className="bg-gradient-to-br from-amber-50/50 to-stone-50 rounded-xl border border-amber-200/80 p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-serif font-bold text-sm text-stone-900">Mercato AI Briefing</h3>
+                <p className="text-[11px] text-stone-500">Your AI business companion</p>
+              </div>
+            </div>
+            <button
+              onClick={() => onNavigateTab('copilot')}
+              className="text-xs text-amber-700 hover:text-amber-800 font-semibold flex items-center gap-1 transition-colors"
+            >
+              <span>Chat</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </button>
           </div>
 
-          <div className="space-y-2.5 text-xs text-stone-700">
-            <div className="p-3 bg-white rounded-lg border border-stone-200">
-              <p className="font-semibold text-stone-900">Tenant-Scoped Queries</p>
-              <p className="text-stone-500 mt-0.5">
-                Every request requires a verified <code className="font-mono bg-stone-100 px-1 py-0.5 rounded">BusinessMembership</code>. Client-submitted IDs are never trusted blindly.
+          <div className="space-y-2.5 text-xs">
+            <div className="p-3 bg-white rounded-xl border border-stone-200/80 shadow-xs">
+              <div className="flex items-center gap-1.5 text-amber-800 font-semibold mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>Today's Performance</span>
+              </div>
+              <p className="text-stone-600 leading-relaxed">
+                {health.todaySalesCount > 0
+                  ? `You have recorded ${health.todaySalesCount} sales totaling ${business.currencySymbol}${health.todayRevenue.toFixed(2)}. ${health.todayRevenue >= business.targetDailyRevenue ? 'Target reached!' : `Progress: ${health.revenueTargetProgress}% of daily goal.`}`
+                  : 'No sales recorded yet today. Use "Record Sale" to start logging customer purchases.'}
               </p>
             </div>
 
-            <div className="p-3 bg-white rounded-lg border border-stone-200">
-              <p className="font-semibold text-stone-900">Inventory Movement Ledger</p>
-              <p className="text-stone-500 mt-0.5">
-                Every stock delta creates an <code className="font-mono bg-stone-100 px-1 py-0.5 rounded">InventoryMovement</code> recording previous stock, delta, resulting stock, and reason.
-              </p>
-            </div>
+            {health.lowStockItemsCount > 0 && (
+              <div className="p-3 bg-white rounded-xl border border-amber-200 shadow-xs">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-amber-800 flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> Stock Alert
+                  </span>
+                  <button
+                    onClick={() => onNavigateTab('inventory')}
+                    className="text-[11px] text-amber-700 font-bold hover:underline"
+                  >
+                    Restock
+                  </button>
+                </div>
+                <p className="text-stone-600">
+                  {health.lowStockItemsCount} items are running below reorder threshold.
+                </p>
+              </div>
+            )}
 
-            <div className="p-3 bg-white rounded-lg border border-stone-200">
-              <p className="font-semibold text-stone-900">Deterministic Financials</p>
-              <p className="text-stone-500 mt-0.5">
-                Calculations for margins, profit, subtotals, and totals are computed strictly on the backend server.
-              </p>
+            <div className="p-3 bg-white rounded-xl border border-stone-200/80 shadow-xs">
+              <p className="font-semibold text-stone-800 mb-1">Recommended Quick Action</p>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <button
+                  onClick={() => onNavigateTab('pos')}
+                  className="px-2.5 py-2 bg-stone-50 hover:bg-amber-50 hover:border-amber-200 border border-stone-200 rounded-lg text-center font-medium text-stone-700 transition-colors"
+                >
+                  Record Sale
+                </button>
+                <button
+                  onClick={() => onNavigateTab('inventory')}
+                  className="px-2.5 py-2 bg-stone-50 hover:bg-amber-50 hover:border-amber-200 border border-stone-200 rounded-lg text-center font-medium text-stone-700 transition-colors"
+                >
+                  Add Product
+                </button>
+              </div>
             </div>
           </div>
         </div>

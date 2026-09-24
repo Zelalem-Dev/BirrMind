@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronRight, ChevronLeft, CheckCircle2,
@@ -328,9 +328,8 @@ export function Onboarding() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-amber-50/30 flex flex-col">
       <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-white/80 backdrop-blur-sm">
-        <div className="flex items-center gap-2.5">
-          <Logo className="w-7 h-7 text-amber-600" />
-          <span className="font-serif font-semibold text-stone-900">BirrMind</span>
+        <div className="flex items-center">
+          <Logo size="sm" variant="dark" layout="inline" />
         </div>
         <span className="text-xs text-stone-500">Step {step} of {STEPS.length}</span>
       </div>

@@ -113,18 +113,8 @@ export const ShellHeader: React.FC<ShellHeaderProps> = ({
         <div className="flex items-center justify-between py-2.5 gap-3">
           {/* Brand & Business Selector */}
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => setActiveTab('overview')}>
-              <Logo size="sm" variant="light" showText={false} />
-              <div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="font-serif font-bold text-base tracking-tight text-white">
-                    BirrMind
-                  </span>
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-medium border border-amber-500/30">
-                    Mercato AI
-                  </span>
-                </div>
-              </div>
+            <div className="flex items-center cursor-pointer group" onClick={() => setActiveTab('overview')}>
+              <Logo size="md" variant="light" layout="inline" />
             </div>
 
             {/* Business Selector (only if multiple accessible businesses) */}

@@ -58,13 +58,10 @@ export function Auth() {
     <div className="min-h-screen bg-stone-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-6">
-          <Logo className="w-12 h-12 text-amber-600" />
+          <Logo size="lg" variant="dark" layout="inline" />
         </div>
-        <h2 className="text-center text-3xl font-serif font-bold tracking-tight text-stone-900">
-          Welcome to BirrMind
-        </h2>
-        <p className="mt-2 text-center text-sm text-stone-600">
-          {mode === 'signin' ? 'Sign in to your business' : 'Register your business'}
+        <p className="text-center text-sm text-stone-600">
+          {mode === 'signin' ? 'Sign in to your business workspace' : 'Register your business workspace'}
         </p>
       </div>
 

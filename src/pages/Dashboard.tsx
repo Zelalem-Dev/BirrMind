@@ -159,11 +159,17 @@ export function Dashboard() {
   if (loading && !state) {
     return (
       <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center text-white font-serif font-bold text-2xl shadow-lg mb-4 animate-pulse">
-          M
+        <img
+          src="/assets/logo-icon.png"
+          alt="BirrMind Logo"
+          className="h-16 w-auto object-contain mb-4 animate-pulse"
+          style={{ aspectRatio: '153 / 177' }}
+        />
+        <div className="flex items-baseline gap-1.5 mb-1">
+          <span className="font-serif font-bold text-xl text-stone-900">BirrMind</span>
+          <span className="font-sans font-bold text-xs uppercase tracking-wider text-amber-600">MERCATO AI</span>
         </div>
-        <p className="font-serif font-bold text-lg text-stone-900">Loading BirrMind Workspace...</p>
-        <p className="text-xs text-stone-500 mt-1">Connecting to your business companion</p>
+        <p className="text-xs text-stone-500">Connecting to your business workspace</p>
       </div>
     );
   }
@@ -368,10 +374,9 @@ export function Dashboard() {
 
       {/* Clean User-Facing SaaS Footer (No Developer Jargon) */}
       <footer className="border-t border-stone-200 bg-white py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
-          <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-stone-900">BirrMind</span>
-            <span>• Powered by Mercato AI</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-500">
+          <div className="flex items-center">
+            <Logo size="sm" variant="dark" layout="inline" />
           </div>
           <div className="text-[11px] text-stone-400">
             Intelligent operating companion for Ethiopian small businesses • © 2026 BirrMind

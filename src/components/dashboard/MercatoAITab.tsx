@@ -260,12 +260,19 @@ export const MercatoAITab: React.FC<MercatoAITabProps> = ({
       {/* Header Banner */}
       <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-sm">
-            <Bot className="w-6 h-6" />
-          </div>
+          <img
+            src="/assets/logo-icon.png"
+            alt="BirrMind Mercato AI"
+            className="h-10 w-auto object-contain flex-shrink-0"
+            style={{ aspectRatio: '153 / 177' }}
+          />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-serif font-bold text-xl text-stone-900">Mercato AI Business Brain</h1>
+              <h1 className="font-serif font-bold text-xl text-stone-900 flex items-baseline gap-1.5">
+                <span>BirrMind</span>
+                <span className="font-sans font-bold text-xs tracking-wider uppercase text-amber-600">MERCATO AI</span>
+                <span className="font-serif text-stone-700 font-semibold text-lg ml-1">Business Brain</span>
+              </h1>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold border border-amber-200">
                 Grounding Active
               </span>

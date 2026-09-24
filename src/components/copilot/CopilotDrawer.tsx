@@ -202,12 +202,18 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
       
       <div className="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl z-50 flex flex-col transform transition-transform duration-300">
         <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-amber-50/80">
-          <div className="flex items-center gap-2 text-amber-950">
-            <div className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
-              M
-            </div>
+          <div className="flex items-center gap-2.5 text-stone-900">
+            <img
+              src="/assets/logo-icon.png"
+              alt="Mercato AI"
+              className="h-8 w-auto object-contain flex-shrink-0"
+              style={{ aspectRatio: '153 / 177' }}
+            />
             <div>
-              <h2 className="font-serif font-bold text-base">Mercato AI Copilot</h2>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-serif font-bold text-base text-stone-900">BirrMind</span>
+                <span className="font-sans font-bold text-[10px] tracking-wider uppercase text-amber-600">MERCATO AI</span>
+              </div>
               <p className="text-[10px] text-stone-500">{business.name}</p>
             </div>
           </div>

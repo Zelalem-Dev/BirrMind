@@ -3,41 +3,74 @@
 ## Local Development
 To run the BirrMind Mercato AI locally:
 1. `npm install`
-2. Ensure you have the required environment variables in your `.env` file (see below).
+2. Copy `.env.example` to `.env` and fill in your keys.
 3. Start the dev server: `npm run dev`
 
 ## Environment Variables
 Create a `.env` file from `.env.example`. The following keys are expected:
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SECRET_KEY`
-- `GEMINI_API_KEY`
-- `ADDIS_API_KEY` (Optional)
-- `FAL_KEY` (Optional)
-- `ELEVENLABS_API_KEY` (Optional)
-- `ELEVENLABS_VOICE_ID` (Optional)
-- `PORT` (Provided automatically by Render)
+
+| Variable | Where used | Notes |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Frontend (browser) | Must start with `https://` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Frontend (browser) | Anon/publishable key (starts with `eyJ`) |
+| `SUPABASE_URL` | Backend (server) | Same URL as above |
+| `SUPABASE_SECRET_KEY` | Backend (server) | Service role key — NEVER exposed to browser |
+| `GEMINI_API_KEY` | Backend (server) | Your Google Gemini API key |
+| `ADDIS_API_KEY` | Backend (server) | Optional |
+| `FAL_KEY` | Backend (server) | Optional |
+| `ELEVENLABS_API_KEY` | Backend (server) | Optional |
+| `ELEVENLABS_VOICE_ID` | Backend (server) | Optional |
+| `PORT` | Backend (server) | Automatically set by Render to `10000` |
+
+> **Important:** Vite bakes `VITE_*` variables into the frontend bundle **at build time**.
+> This means they must be set in Render's Environment Variables tab **before** the build runs.
 
 ## GitHub
-- Repository: Make sure to push to the primary branch `main`.
-- NO SECRETS should ever be committed to the codebase. Ensure `.env` is listed in `.gitignore`.
+- Repository: Push to the `main` branch.
+- `.env` is in `.gitignore` — secrets are never committed.
 
 ## Render Deployment
-1. Go to [Render](https://render.com/) and create a new **Web Service**.
+
+### Step 1: Create a Web Service
+1. Go to [Render](https://render.com/) → **New → Web Service**.
 2. Connect your GitHub repository.
-3. Configure the service:
-   - **Environment:** Node
-   - **Build Command:** `npm install && npm run build`
-   - **Start Command:** `npm run start`
-4. Add all environment variables from your local `.env` into the Render Environment Variables tab.
+
+### Step 2: Configure Build & Start
+Set these **exactly** in the Render dashboard:
+
+| Setting | Value |
+|---|---|
+| **Environment** | `Node` |
+| **Build Command** | `npm install && npm run build` |
+| **Start Command** | `npm run start` |
+| **Publish Directory** | *(leave blank — not applicable for Web Services, only Static Sites)* |
+
+> **Note:** "Publish Directory" is only for Render **Static Sites**. This app is a **Web Service**
+> (Node.js server). The `npm run start` command runs `node dist/server.cjs` which serves
+> the built `dist/` folder automatically. Do NOT use the "Static Site" deploy type.
+
+### Step 3: Set Environment Variables in Render
+In the Render dashboard → your service → **Environment** tab, add:
+
+```
+NODE_ENV=production
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJ...your anon key...
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SECRET_KEY=eyJ...your service role key...
+GEMINI_API_KEY=your-gemini-key
+```
+
+### Step 4: Deploy
+Click **"Manual Deploy" → "Clear build cache & deploy"** to ensure a fresh build with the new env vars.
 
 ## Supabase Auth Configuration
-Once the Render URL is generated (e.g., `https://birrmind.onrender.com`):
-1. Go to your Supabase Dashboard -> Authentication -> URL Configuration.
-2. Set your **Site URL** to your Render URL.
-3. Add the Render URL to the **Redirect URLs** list.
+Once the Render URL is live (e.g., `https://birrmind.onrender.com`):
+1. Go to Supabase Dashboard → **Authentication → URL Configuration**.
+2. Set **Site URL** to `https://birrmind.onrender.com`.
+3. Add `https://birrmind.onrender.com/**` to the **Redirect URLs** list.
 
-## Production Verification
-- The production server serves the frontend statically from the `dist/` directory and exposes the API on the same port.
-- Health Check: Verify `GET /api/health` returns `{"status":"ok"}`.
-- Authentication should require actual login in production, falling back to demo users is strictly disabled.
+## Verifying the Deployment
+1. Visit `https://birrmind.onrender.com/api/health` — should return `{"status":"ok"}`.
+2. Open browser DevTools → **Console** tab — should show no red errors.
+3. Open browser DevTools → **Network** tab — `index-*.js` and `index-*.css` should return **200 OK**.

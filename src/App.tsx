@@ -16,6 +16,9 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
 export default function App() {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [demoActive, setDemoActive] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && localStorage.getItem('birrmind_demo_mode') === 'true';
+  });
 
   useEffect(() => {
     // If Supabase is not configured at all, skip session check immediately.
@@ -50,6 +53,14 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const handleStorage = () => {
+      setDemoActive(localStorage.getItem('birrmind_demo_mode') === 'true');
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center gap-3">
@@ -58,18 +69,6 @@ export default function App() {
       </div>
     );
   }
-
-  const [demoActive, setDemoActive] = useState<boolean>(() => {
-    return typeof window !== 'undefined' && localStorage.getItem('birrmind_demo_mode') === 'true';
-  });
-
-  useEffect(() => {
-    const handleStorage = () => {
-      setDemoActive(localStorage.getItem('birrmind_demo_mode') === 'true');
-    };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
 
   // Authenticated if there is an active Supabase session or demo mode is active.
   const isAuthenticated = Boolean(session || demoActive);

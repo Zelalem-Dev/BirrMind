@@ -7,6 +7,64 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* =========================================================================
+     GLOBAL TEXT VISIBILITY FIX FOR ALL FORM ELEMENTS
+     Forces dark text (#1c1917) on light inputs and white text (#f5f5f4) on dark
+     inputs across all screens, modals, tabs, and onboarding steps.
+     ========================================================================= */
+  input,
+  textarea,
+  select {
+    color: #1c1917; /* Default to high-contrast dark text */
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #78716c;
+    opacity: 1;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus,
+  input:active,
+  textarea:active,
+  select:active {
+    color: #1c1917;
+  }
+
+  /* Specific rule for light/standard backgrounds: guarantees typed text is never invisible */
+  input:not([class*="bg-stone-800"]):not([class*="bg-stone-900"]):not([class*="bg-stone-950"]):not([class*="text-white"]):not([class*="text-stone-100"]):not([class*="text-stone-200"]),
+  textarea:not([class*="bg-stone-800"]):not([class*="bg-stone-900"]):not([class*="bg-stone-950"]):not([class*="text-white"]):not([class*="text-stone-100"]):not([class*="text-stone-200"]),
+  select:not([class*="bg-stone-800"]):not([class*="bg-stone-900"]):not([class*="bg-stone-950"]):not([class*="text-white"]):not([class*="text-stone-100"]):not([class*="text-stone-200"]) {
+    color: #1c1917 !important;
+  }
+
+  /* Form controls explicitly styled for dark mode or dark stone backgrounds */
+  .dark input,
+  .dark textarea,
+  .dark select,
+  input.bg-stone-900,
+  input.bg-stone-800,
+  input.bg-stone-950,
+  textarea.bg-stone-900,
+  textarea.bg-stone-800,
+  textarea.bg-stone-950,
+  select.bg-stone-900,
+  select.bg-stone-800,
+  select.bg-stone-950 {
+    color: #f5f5f4 !important;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder,
+  input.bg-stone-900::placeholder,
+  input.bg-stone-800::placeholder,
+  textarea.bg-stone-900::placeholder,
+  textarea.bg-stone-800::placeholder {
+    color: #a8a29e;
+  }
 }
 
 /* Custom scrollbar for dark stone surfaces */

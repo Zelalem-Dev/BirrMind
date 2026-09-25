@@ -335,6 +335,10 @@ export class SupabaseRepository {
     return data.map(this.mapMovement);
   }
 
+  public async getInventoryMovements(businessId: string, limit = 50): Promise<InventoryMovement[]> {
+    return this.getRecentMovements(businessId, limit);
+  }
+
   private mapMovement(data: any): InventoryMovement {
     return {
       id: data.id,
@@ -355,7 +359,25 @@ export class SupabaseRepository {
 
   // --- Point of Sale (Transactions) ---
 
-  public async createTransaction(businessId: string, txData: Omit<Transaction, 'id' | 'createdAt' | 'status' | 'items'>, items: Omit<TransactionItem, 'id' | 'transactionId'>[]): Promise<Transaction> {
+  public async createTransaction(
+    businessIdOrTx: string | Omit<Transaction, 'id' | 'createdAt' | 'status' | 'items'>,
+    txDataOrItems: any,
+    maybeItems?: Omit<TransactionItem, 'id' | 'transactionId'>[]
+  ): Promise<Transaction> {
+    let businessId: string;
+    let txData: Omit<Transaction, 'id' | 'createdAt' | 'status' | 'items'>;
+    let items: Omit<TransactionItem, 'id' | 'transactionId'>[];
+
+    if (typeof businessIdOrTx === 'string') {
+      businessId = businessIdOrTx;
+      txData = txDataOrItems;
+      items = maybeItems || [];
+    } else {
+      txData = businessIdOrTx;
+      businessId = txData.businessId;
+      items = txDataOrItems || [];
+    }
+
     const { data: tx, error: txError } = await this.db
       .from('transactions')
       .insert({
@@ -385,12 +407,16 @@ export class SupabaseRepository {
       subtotal: item.subtotal
     }));
     
-    const { data: insertedItems, error: itemsError } = await this.db
-      .from('transaction_items')
-      .insert(dbItems)
-      .select();
-      
-    if (itemsError) throw itemsError;
+    let insertedItems = [];
+    if (dbItems.length > 0) {
+      const { data: inserted, error: itemsError } = await this.db
+        .from('transaction_items')
+        .insert(dbItems)
+        .select();
+        
+      if (itemsError) throw itemsError;
+      insertedItems = inserted || [];
+    }
     
     return this.mapTransaction(tx, insertedItems);
   }
@@ -405,6 +431,10 @@ export class SupabaseRepository {
       
     if (error) return [];
     return data.map((tx: any) => this.mapTransaction(tx, tx.transaction_items));
+  }
+
+  public async getTransactions(businessId: string, limit = 50): Promise<Transaction[]> {
+    return this.getRecentTransactions(businessId, limit);
   }
 
   private mapTransaction(tx: any, items: any[]): Transaction {
@@ -436,7 +466,13 @@ export class SupabaseRepository {
 
   // --- Expenses & Operating Costs ---
 
-  public async createExpense(businessId: string, expense: Omit<Expense, 'id' | 'createdAt'>): Promise<Expense> {
+  public async createExpense(
+    businessIdOrExpense: string | Omit<Expense, 'id' | 'createdAt'>,
+    maybeExpense?: Omit<Expense, 'id' | 'createdAt'>
+  ): Promise<Expense> {
+    const expense = typeof businessIdOrExpense === 'string' ? maybeExpense! : businessIdOrExpense;
+    const businessId = typeof businessIdOrExpense === 'string' ? businessIdOrExpense : expense.businessId;
+
     const { data, error } = await this.db
       .from('expenses')
       .insert({
@@ -448,7 +484,9 @@ export class SupabaseRepository {
         vendor: expense.vendor,
         description: expense.description,
         payment_method: expense.paymentMethod,
-        status: expense.status
+        receipt_url: (expense as any).receiptUrl,
+        notes: (expense as any).notes,
+        status: expense.status || 'paid'
       })
       .select()
       .single();
@@ -467,6 +505,10 @@ export class SupabaseRepository {
       
     if (error) return [];
     return data.map(this.mapExpense);
+  }
+
+  public async getExpenses(businessId: string, limit = 50): Promise<Expense[]> {
+    return this.getRecentExpenses(businessId, limit);
   }
 
   private mapExpense(data: any): Expense {
@@ -507,6 +549,10 @@ export class SupabaseRepository {
     return this.mapEvent(data);
   }
 
+  public async createBusinessEvent(event: Omit<BusinessEvent, 'id' | 'createdAt'>): Promise<BusinessEvent> {
+    return this.logEvent(event.businessId, event);
+  }
+
   public async getRecentEvents(businessId: string, limit = 50): Promise<BusinessEvent[]> {
     const { data, error } = await this.db
       .from('business_events')
@@ -517,6 +563,10 @@ export class SupabaseRepository {
       
     if (error) return [];
     return data.map(this.mapEvent);
+  }
+
+  public async getBusinessEvents(businessId: string, limit = 50): Promise<BusinessEvent[]> {
+    return this.getRecentEvents(businessId, limit);
   }
 
   private mapEvent(data: any): BusinessEvent {
@@ -536,18 +586,38 @@ export class SupabaseRepository {
 
   // --- Business Memories ---
 
-  public async getMemories(businessId: string): Promise<BusinessMemory[]> {
+  public async getMemories(businessId: string, limit = 50): Promise<BusinessMemory[]> {
     const { data, error } = await this.db
       .from('business_memories')
       .select('*')
       .eq('business_id', businessId)
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(limit);
       
     if (error) return [];
     return data.map(this.mapMemory);
   }
 
-  public async createMemory(businessId: string, memory: Omit<BusinessMemory, 'id' | 'businessId' | 'createdAt' | 'lastReferencedAt'>): Promise<BusinessMemory> {
+  public async getMemory(businessId: string, id: string): Promise<BusinessMemory | null> {
+    const { data, error } = await this.db
+      .from('business_memories')
+      .select('*')
+      .eq('business_id', businessId)
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return this.mapMemory(data);
+  }
+
+  public async createMemory(
+    businessIdOrMemory: string | Omit<BusinessMemory, 'id' | 'createdAt' | 'lastReferencedAt'>,
+    maybeMemory?: Omit<BusinessMemory, 'id' | 'businessId' | 'createdAt' | 'lastReferencedAt'>
+  ): Promise<BusinessMemory> {
+    const memory = typeof businessIdOrMemory === 'string' ? maybeMemory! : businessIdOrMemory;
+    const businessId = typeof businessIdOrMemory === 'string' ? businessIdOrMemory : (memory as any).businessId;
+
     const { data, error } = await this.db
       .from('business_memories')
       .insert({
@@ -563,6 +633,40 @@ export class SupabaseRepository {
       
     if (error) throw error;
     return this.mapMemory(data);
+  }
+
+  public async updateMemory(
+    businessId: string,
+    id: string,
+    updates: Partial<Pick<BusinessMemory, 'fact' | 'type' | 'confidence' | 'status' | 'lastReferencedAt'>>
+  ): Promise<BusinessMemory | null> {
+    const dbUpdates: any = {};
+    if (updates.fact !== undefined) dbUpdates.fact = updates.fact;
+    if (updates.type !== undefined) dbUpdates.type = updates.type;
+    if (updates.confidence !== undefined) dbUpdates.confidence = updates.confidence;
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.lastReferencedAt !== undefined) dbUpdates.last_referenced_at = updates.lastReferencedAt;
+
+    const { data, error } = await this.db
+      .from('business_memories')
+      .update(dbUpdates)
+      .eq('id', id)
+      .eq('business_id', businessId)
+      .select()
+      .single();
+
+    if (error || !data) return null;
+    return this.mapMemory(data);
+  }
+
+  public async deleteMemory(businessId: string, id: string): Promise<boolean> {
+    const { error } = await this.db
+      .from('business_memories')
+      .delete()
+      .eq('id', id)
+      .eq('business_id', businessId);
+
+    return !error;
   }
 
   public async updateMemoryReferenceTime(memoryId: string): Promise<void> {
@@ -599,6 +703,35 @@ export class SupabaseRepository {
     return data.map(this.mapRecommendation);
   }
 
+  public async getRecommendations(businessId: string, limit = 50, status?: string): Promise<AIRecommendation[]> {
+    let query = this.db
+      .from('ai_recommendations')
+      .select('*')
+      .eq('business_id', businessId)
+      .order('created_at', { ascending: false })
+      .limit(typeof limit === 'number' ? limit : 50);
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error || !data) return [];
+    return data.map(this.mapRecommendation);
+  }
+
+  public async getRecommendation(businessId: string, id: string): Promise<AIRecommendation | null> {
+    const { data, error } = await this.db
+      .from('ai_recommendations')
+      .select('*')
+      .eq('business_id', businessId)
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return this.mapRecommendation(data);
+  }
+
   public async createRecommendation(businessId: string, rec: Omit<AIRecommendation, 'id' | 'businessId' | 'createdAt'>): Promise<AIRecommendation> {
     const { data, error } = await this.db
       .from('ai_recommendations')
@@ -621,6 +754,28 @@ export class SupabaseRepository {
     return this.mapRecommendation(data);
   }
 
+  public async updateRecommendation(
+    businessId: string,
+    id: string,
+    updates: Partial<Pick<AIRecommendation, 'status' | 'confirmedByUserId' | 'confirmedAt'>>
+  ): Promise<AIRecommendation | null> {
+    const dbUpdates: any = {};
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.confirmedByUserId !== undefined) dbUpdates.confirmed_by_user_id = updates.confirmedByUserId;
+    if (updates.confirmedAt !== undefined) dbUpdates.confirmed_at = updates.confirmedAt;
+
+    const { data, error } = await this.db
+      .from('ai_recommendations')
+      .update(dbUpdates)
+      .eq('id', id)
+      .eq('business_id', businessId)
+      .select()
+      .single();
+
+    if (error || !data) return null;
+    return this.mapRecommendation(data);
+  }
+
   public async updateRecommendationStatus(recId: string, status: 'pending' | 'accepted' | 'dismissed' | 'completed'): Promise<boolean> {
     const { error } = await this.db
       .from('ai_recommendations')
@@ -628,6 +783,10 @@ export class SupabaseRepository {
       .eq('id', recId);
       
     return !error;
+  }
+
+  public resetDemoData(): void {
+    console.log('[SupabaseRepository] resetDemoData called (no-op in live Supabase mode)');
   }
 
   private mapRecommendation(data: any): AIRecommendation {

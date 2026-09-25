@@ -115,12 +115,38 @@ This document represents the exhaustive, component-by-component product audit of
   2. `src/components/billing/SubscriptionModal.tsx`: Created a transparent Early Access Partner modal displaying the free pioneer plan with no fake payment gateway deception.
   3. `src/components/dashboard/OverviewTab.tsx`: Replaced database telemetry cards with high-converting quick actions and live sales performance indicators.
 
+### 3.6 Global Text Input Visibility & Theme Contrast (P0)
+- **Previous State:** Global `body { color: #f5f5f4; }` style in `src/index.css` caused light-background `<input>`, `<textarea>`, and `<select>` elements to inherit near-white text on light cards, rendering merchant-typed text completely invisible across all onboarding steps, product forms, expense modals, and settings.
+- **Remediation Completed:**
+  1. `src/index.css`: Injected high-contrast base rules for all input, textarea, and select elements forcing text color `#1c1917` (warm charcoal) with high-visibility placeholders (`#78716c`), active, and focus states.
+  2. Maintained explicit dark-mode and dark-stone container support (`.dark`, `.bg-stone-900`, `.bg-stone-800`, `.bg-stone-950`) forcing `#f5f5f4` text.
+  3. Form inputs across onboarding wizard, POS cart, expense forms, and product creation now display crisp, high-contrast text.
+
+### 3.7 Repository API Surface Alignment & Onboarding Completion (P0)
+- **Previous State:** Clicking "Create my business" at the conclusion of the 7-step onboarding crashed the backend server with `repository.getInventoryMovements is not a function`. The live `SupabaseRepository` class only had `getRecentMovements` and was missing aliases/methods required by `server.ts` and `businessService.ts`.
+- **Remediation Completed:**
+  1. `server/db/repository.supabase.ts`: Added `getInventoryMovements(businessId, limit)` delegating directly to `getRecentMovements`.
+  2. Added missing repository methods and aliases:
+     - `getTransactions(businessId, limit)`
+     - `getExpenses(businessId, limit)`
+     - `createBusinessEvent(event)`
+     - `getBusinessEvents(businessId, limit)`
+     - `getRecommendations(businessId, limit, status)`
+     - `getRecommendation(businessId, id)`
+     - `updateRecommendation(businessId, id, updates)`
+     - `getMemory(businessId, id)`
+     - `updateMemory(businessId, id, updates)`
+     - `deleteMemory(businessId, id)`
+     - `resetDemoData()`
+  3. Upgraded `createTransaction`, `createExpense`, and `createMemory` to polymorphic signatures supporting both single-object calls and `(businessId, ...)` calls.
+  4. Verified zero-state onboarding completion creates business, membership, seed events, and initial memories without any runtime exceptions.
+
 ---
 
 ## 4. Failure Analysis & Remaining Items
 
 ### What is Missing
-1. **Automated Twilio/Telebirr SMS Webhooks:** Currently, transactions are recorded in-app. Direct live bank push webhooks from Telebirr and CBE Birr require an official merchant aggregator aggregator agreement (Ethio Telecom / Commercial Bank of Ethiopia) which cannot be simulated in code without licensed commercial credentials.
+1. **Automated Twilio/Telebirr SMS Webhooks:** Currently, transactions are recorded in-app. Direct live bank push webhooks from Telebirr and CBE Birr require an official merchant aggregator agreement (Ethio Telecom / Commercial Bank of Ethiopia) which cannot be simulated in code without licensed commercial credentials.
 2. **Offline Local SQLite / IndexedDB Sync Engine:** When offline, the app holds session data in memory. A full background service-worker synchronization protocol across network drops is recommended for the v1.5 release.
 
 ### Why It Matters
@@ -129,6 +155,8 @@ Ethiopian merchants occasionally experience intermittent 4G/fiber connectivity i
 ### What Was Fixed
 - Multi-tenant data segregation.
 - Complete first-time customer onboarding wizard.
+- Global text contrast and input visibility fix across all form components.
+- Complete `SupabaseRepository` method alignment (`getInventoryMovements`, polymorphic transaction/expense/memory methods).
 - Removal of all developer prototype jargon.
 - Dedicated Mercato AI tab with real Web Speech API recognition.
 - Grounded Market Pulse provenance.
